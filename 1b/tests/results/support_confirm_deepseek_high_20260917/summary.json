@@ -1,0 +1,15 @@
+{
+  "records": 6,
+  "valid": 6,
+  "target_pass": 5,
+  "explanation_grades": {
+    "fail": 1,
+    "pass": 3,
+    "secondary_error": 2
+  },
+  "recorded_cost": 0.0729372310722,
+  "audit_type": "author-agent, not independent human",
+  "exact_tuple_and_prompt_hash_check": "passed",
+  "selected_replication": true,
+  "note": "Headline verdict and explanation/repair validity are separate. Ambiguous, underspecified and boundary cases are not decisive errors."
+}

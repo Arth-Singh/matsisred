@@ -1,0 +1,18 @@
+{
+  "records": 18,
+  "valid": 18,
+  "target_pass": 18,
+  "explanation_grades": {
+    "boundary_caveat_not_counted": 1,
+    "explanation_fail": 3,
+    "overclaim_not_primary_count": 1,
+    "pass": 8,
+    "repair_fail": 1,
+    "underspecified_repair": 4
+  },
+  "recorded_cost": 0.7499844,
+  "audit_type": "author-agent, not independent human",
+  "exact_tuple_and_prompt_hash_check": "passed",
+  "selected_replication": true,
+  "note": "Headline verdict and explanation/repair validity are separate. Ambiguous, underspecified and boundary cases are not decisive errors."
+}

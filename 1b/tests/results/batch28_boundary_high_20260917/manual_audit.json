@@ -1,0 +1,267 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b28-01",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0",
+      "answer": "**Assessment.** The argument confuses marginal coverage with joint coverage. Reweighting (importance weights, propensity adjustment, etc.) identifies a target quantity only under positivity on the *joint* covariate support: every deployment cell (A,B) must have positive source mass. Source mass is entirely on (0,0) and (1,1); deployment is (0,1), which has source probability zero. The weight P_dep(0,1)/P_src(0,1) is undefined, and P(Y=1|A=0,B=1) is completely unconstrained by source data \u2014 every value in [0,1] is compatible with the stable mechanism. Infinite data cannot fix a quantity the data never touch, so this is non\u2011identification, not imprecision.\n\n**Repairs.** (i) Missing information: any labeled deployment outcomes (or even bounds) at (0,1). (ii) Structural assumption: an *exclusion restriction* such as Y \u22a5 B | A (B is irrelevant once A is known), giving P(Y|0,1)=P(Y|0,0)=0.2; or symmetrically Y \u22a5 A | B, giving 0.8; or equal main effects, giving 0.5 under additivity.\n\n**Why this, not generic additivity.** The usual covariate\u2011shift remedy\u2014assume no A\u00d7B interaction and extrapolate\u2014fails here. Because A=B in every source record, the two main effects are perfectly collinear: the source supplies two cells but an additive model has three parameters, identifying only \u03b2_A+\u03b2_B=0.6. Only an assumption that fixes how that total splits between A and B (an exclusion or symmetry restriction) yields a unique value for the unseen cell.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Nontrivial target bounds alone do not point-identify target; the exclusion/symmetry repairs supplied are valid."
+      ]
+    },
+    {
+      "item": "b28-01",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0",
+      "answer": "**The argument is wrong: this is a support failure, not a precision problem.**\n\nReweighting identifies a target mean only if the deployment covariate distribution is absolutely continuous w.r.t. the source's *joint* distribution. Here source mass sits on {(0,0),(1,1)} only; A and B are perfectly collinear. The deployment cell (0,1) has zero source probability, so its importance weight is undefined and no amount of data touches P(Y=1|0,1). Marginal coverage of each feature is irrelevant \u2014 the source never varies A holding B fixed, so main effects of A and B are not separately estimable. Stability of P(Y|A,B) transports only where it was observed; on (0,1) it is completely unrestricted (any value in [0,1]).\n\n**What resolves it.** Either data \u2014 labeled outcomes (or a validated risk model) from any population placing mass on (0,1), or knowledge of one feature's isolated effect \u2014 or a parametric restriction with *at most two* free parameters.\n\n**Why the count matters here.** The source yields exactly two moments (0.2, 0.8). A no-interaction additive model has three parameters (intercept, \u03b1_A, \u03b1_B), so it remains underidentified \u2014 the familiar \"additivity handles covariate shift\" move fails for this design. Adding exchangeability (\u03b1_A = \u03b1_B, justified only by substantive symmetry of the features) gives two parameters, two equations: on the risk scale P(Y=1|0,1)=0.5.\n\nOtherwise, report partial identification: monotonicity bounds it to [0.2, 0.8].",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "At most two free parameters does not itself ensure identification; design rank/injectivity matters. Explicit equal-effects additive repair is valid."
+      ]
+    },
+    {
+      "item": "b28-01",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0",
+      "answer": "The argument is incorrect. Reweighting for covariate shift requires that the support of the deployment distribution be contained within the support of the source distribution. Here, the source contains only (0,0) and (1,1), while deployment consists solely of (0,1). The conditional failure probability at (0,1) is completely unidentified\u2014no amount of source data or reweighting can recover it without additional assumptions. The fact that each feature value appears marginally in the source is irrelevant; what matters is the missing joint cell.\n\nA valid structural repair is to assume that the conditional failure probability depends only on the sum of the features and is linear in that sum: \\(P(Y=1 \\mid A,B) = \\alpha + \\beta(A+B)\\). The two source points give \\(\\alpha = 0.2\\) and \\(\\beta = 0.3\\), fully determining the function. Deployment\u2019s (0,1) cell (sum=1) then yields \\(P=0.5\\). This assumption works for this specific design because the two observed cells differ by two units in the sum, while the target cell lies exactly halfway. The linearity and additivity constrain the unobserved individual effects, turning the two support points into a complete identifying equation for the missing cell\u2014something generic no-interaction models alone cannot do without additional equality constraints.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-01",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0",
+      "answer": "The lab\u2019s argument is flawed because it conflates *marginal* feature presence with *joint* overlap. Reweighting requires the source data to place non-zero probability mass on the exact combination (0,1) seen in deployment. Because $P_{source}(A=0, B=1) = 0$, reweighting ratios are undefined. The deployment failure rate is fundamentally unidentified due to a complete lack of joint overlap, not a lack of estimation precision. \n\nThe missing information is the conditional probability $P(Y=1|A=0, B=1)$. To resolve identification, we require a strong structural assumption, such as conditional independence: assuming $Y \\perp\\!\\!\\!\\perp A \\mid B$ (feature A has no independent effect on the failure outcome).\n\nWhy this specific repair is necessary and sufficient here: Often, researchers extrapolate to unobserved combinations by assuming a standard additive model with no interactions (e.g., $P(Y=1) = \\alpha + \\beta A + \\gamma B$). However, for *this particular source design*, an additive model fails. Because the source only contains (0,0) and (1,1), the individual effects of A ($\\beta$) and B ($\\gamma$) are completely confounded. The stronger conditional independence assumption resolves this by dictating $P(Y=1|0,1) = P(Y=1|1,1)$. Since the source establishes the (1,1) failure rate is 0.8, this identifies the deployment rate as exactly 0.8.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Calls one exclusion restriction necessary and sufficient; it is sufficient, not necessary. Other sufficient repairs exist."
+      ]
+    },
+    {
+      "item": "b28-02",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f",
+      "answer": "**No, the conclusion does not follow.**\n\nAdditivity gives p(A,B)=f(A)+g(B), but the source only constrains\nf(0)+g(0)=0.2 and f(1)+g(1)=0.8. Because A and B vary *together* in the observed contexts, the data cannot separate f from g: adding a constant c to f and subtracting c from g leaves both observed rates unchanged. Deployment's rate f(0)+g(1) shifts by 2c, so it is not identified (only the sum p(0,1)+p(1,0)=1 is pinned down).\n\nTwo compatible mechanisms, all values in [0,1]:\n\n1. f(0)=0, f(1)=0.8; g(0)=0.2, g(1)=0.\n Fits: p(0,0)=0.2, p(1,1)=0.8. Deployment p(0,1)=0.\n\n2. f(0)=0.2, f(1)=0; g(0)=0, g(1)=0.8.\n Fits: p(0,0)=0.2, p(1,1)=0.8. Deployment p(0,1)=1.0.\n\nSame observed data, no interaction, yet deployment failure anywhere from 0 to 1. \"Both feature values were observed\" is insufficient; you need contexts that vary A and B independently (e.g., also (1,0)) to recombine contributions.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "False gauge argument: adding a common c to f and subtracting c from g leaves every sum, including target, unchanged, not shifted by2c. Its two explicit witness mechanisms are nevertheless valid."
+      ]
+    },
+    {
+      "item": "b28-02",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f",
+      "answer": "**No.** Additivity removes the interaction term, but it does not create the needed contrast. Write p(A,B)=f(A)+g(B); normalize f(0)=0. Then the data give only two equations:\n\n- g(0) = 0.2\n- f(1) + g(1) = 0.8\n\nThe deployment target is f(0)+g(1) = g(1), which never appears alone in any observed cell. The observed contexts (0,0) and (1,1) change **both** features simultaneously, so the evaluation design is perfectly collinear in A and B: only the *sum* of the two main effects is learned, not their split. No labels off the diagonal, no separation of contributions.\n\nTwo compatible mechanisms:\n\n1. f(0)=0, f(1)=0.6, g(0)=0.2, g(1)=0.2 \u2192 p(0,1)=0.2\n2. f(0)=0, f(1)=0, g(0)=0.2, g(1)=0.8 \u2192 p(0,1)=0.8\n\nBoth reproduce 0.2 and 0.8 exactly and stay in [0,1] (including p(1,0)=0.8 and 0.2 respectively). In fact the target's sharp bound is the whole interval [0,1]: additivity alone yields no information about deployment.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-01",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0",
+      "answer": "The argument confuses **marginal support** with **joint support**. Although both values of A and of B occur in source data, the deployment cell \\((A,B)=(0,1)\\) has zero source probability. Thus overlap/positivity fails. Reweighting source observations cannot transfer information about that cell:\n\n\\[\nE_D[Y]=P_D(Y=1\\mid A=0,B=1),\n\\]\n\nwhile source data identify only\n\n\\[\nP(Y\\mid 0,0)=0.2,\\qquad P(Y\\mid 1,1)=0.8.\n\\]\n\nStability says the same conditional mechanism applies everywhere, but it does not reveal its value at an input never observed. The deployment failure probability can be any value in \\([0,1]\\), subject to the stated facts. Unlimited source data eliminate sampling error, not this support defect.\n\nOne direct repair is to supply or identify \\(P(Y\\mid A=0,B=1)\\) in either domain. A sufficient structural alternative is an exclusion restriction such as\n\n\\[\nY\\perp B\\mid A,\n\\]\n\nmeaning B does not affect failure once A is fixed. Under this assumption and stability,\n\n\\[\nP_D(Y=1\\mid 0,1)\n =P(Y=1\\mid A=0)\n =P_S(Y=1\\mid 0,0)\n =0.2.\n\\]\n\nThis is sufficient here precisely because the source contains an \\(A=0\\) observation at \\(B=0\\), allowing its risk to be transported to deployment\u2019s \\(B=1\\) cell. Merely reweighting covariates cannot do that.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-02",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f",
+      "answer": "No, the conclusion does not follow. The deployment failure rate is fundamentally unidentifiable.\n\n**Reason:** The additive assumption provides only two constraints from the evaluation data:\n1) $f(0) + g(0) = 0.2$\n2) $f(1) + g(1) = 0.8$\n\nThe deployment context requires calculating $f(0) + g(1)$. Because features $A$ and $B$ are perfectly correlated in the evaluation data, their individual contributions cannot be mathematically disentangled. The system is underdetermined.\n\n**Two Compatible Mechanisms:**\n*   **Mechanism 1:** The risk increase is driven entirely by $B$. \n    Let $f(0)=0.1, f(1)=0.1$ and $g(0)=0.1, g(1)=0.7$. \n    *   Eval (0,0): $0.1 + 0.1 = 0.2$\n    *   Eval (1,1): $0.1 + 0.7 = 0.8$\n    *   Deployment (0,1): $f(0) + g(1) = \\mathbf{0.8}$\n\n*   **Mechanism 2:** The risk increase is driven entirely by $A$. \n    Let $f(0)=0.1, f(1)=0.7$ and $g(0)=0.1, g(1)=0.1$.\n    *   Eval (0,0): $0.1 + 0.1 = 0.2$\n    *   Eval (1,1): $0.7 + 0.1 = 0.8$\n    *   Deployment (0,1): $f(0) + g(1) = \\mathbf{0.2}$\n\nBoth mechanisms match all evaluation probabilities, ensure all possible combinations yield valid probabilities in $[0,1]$, but produce completely different deployment risks.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-03",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96",
+      "answer": "**The objection fails under the supplied assumptions.**\n\nThe reviewer is right about one thing: f and g are not separately identified. Adding a constant c to f and subtracting c from g preserves every observed sum, so the individual contributions are indeterminate.\n\nBut the lab's target is a specific *sum*, and additivity plus the validity constraint pins it down:\n\n- Source gives f(0)+g(0)=0 and f(1)+g(1)=0.\n- Adding: [f(0)+g(1)] + [f(1)+g(0)] = 0.\n- The engineering guarantee says the additive form is a valid probability at *all four* contexts, so both bracketed terms are \u22650.\n- Two nonnegative numbers summing to zero are each zero. Hence f(0)+g(1)=0.\n\nSo deployment's failure probability is exactly zero, identified without observing (0,1). The reviewer's claim that \"additivity cannot separate the contributions\" is true but irrelevant: the target never required separation, only a constrained combination.\n\nThe decisive assumption is validity at the unobserved contexts. Drop it and the reviewer wins: f(0)=\u00bd, f(1)=\u2212\u00bd, g(0)=\u2212\u00bd, g(1)=\u00bd fits source perfectly and yields deployment failure probability 1. The lab's conclusion rests on that supplied guarantee, which the reviewer neglected.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-02",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f",
+      "answer": "No. Additivity gives only\n\n\\[\nf(0)+g(0)=0.2,\\qquad f(1)+g(1)=0.8.\n\\]\n\nThese two equations do not determine the cross-combination \\(f(0)+g(1)\\) needed for \\((A,B)=(0,1)\\).\n\nFor example:\n\n- **Mechanism 1:** \\(f(0)=.2,g(0)=0,f(1)=.2,g(1)=.6\\).  \n  Then \\(P(1\\mid0,1)=.8\\).\n\n- **Mechanism 2:** \\(f(0)=.1,g(0)=.1,f(1)=.5,g(1)=.3\\).  \n  Then \\(P(1\\mid0,1)=.4\\).\n\nBoth reproduce the observed rates \\(0.2\\) and \\(0.8\\), contain no interaction, and keep all probabilities in \\([0,1]\\). Thus deployment\u2019s failure rate is not identifiable without additional assumptions or data.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-03",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96",
+      "answer": "**The objection fails.** It is right that additivity alone, from two \"diagonal\" cells, cannot pin down the level of *f* and *g* \u2014 but the lab's target is a particular *sum*, and that sum is identified by combining additivity with the range restriction that the model give valid probabilities everywhere.\n\nWrite f(0)=a, g(0)=\u2212a (from f(0)+g(0)=0) and f(1)=b, g(1)=\u2212b. The two off-diagonal contexts are\n\n- deployment: f(0)+g(1) = a\u2212b\n- mirror: f(1)+g(0) = b\u2212a\n\nTheir sum is exactly (f(0)+g(0)) + (f(1)+g(1)) = 0. Since both are probabilities, both are \u22650; two nonnegative numbers summing to zero must both be zero. Hence f(0)+g(1)=0: deployment's failure probability is exactly zero, uniquely.\n\nSo the key is that the unobserved cells are *linked*: no-interaction makes the four cell values satisfy one linear identity (diagonal sum = off-diagonal sum), and non-negativity turns that identity into point identification of the off-diagonal cells.\n\nNote what is *not* identified: *a* is arbitrary, so f and g separately remain unknown (f constant, g=\u2212f). The reviewer conflates non-identification of components with non-identification of their sum. Caveats: additivity, exact zeros, and validity at all four contexts are load-bearing assumptions.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-03",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96",
+      "answer": "The reviewer\u2019s objection is incorrect because it ignores the supplied assumption that the additive formula yields a valid probability (specifically, non-negativity) at all four possible contexts.\n\nLet $P(A,B) = f(A) + g(B)$. From the source data, we know $P(0,0) = 0$ and $P(1,1) = 0$. \n\nBecause the mechanism must produce valid probabilities at all contexts, the failure rates at the unobserved combinations must be non-negative: $P(0,1) \\ge 0$ and $P(1,0) \\ge 0$.\n\nUnder strict additivity, the sum of the off-diagonal probabilities equals the sum of the on-diagonal probabilities:\n$P(0,1) + P(1,0) = [f(0) + g(1)] + [f(1) + g(0)]$\n$= [f(0) + g(0)] + [f(1) + g(1)]$\n$= P(0,0) + P(1,1) = 0 + 0 = 0$.\n\nSince $P(0,1)$ and $P(1,0)$ are non-negative numbers that sum to zero, both must be exactly zero. \n\nThe reviewer is correct that the individual functions $f$ and $g$ remain unidentified (e.g., $f(0)$ could be $c$ and $g(1)$ could be $-c$). However, the combination of additivity and the zero-lower-bound constraint forces their sum at the deployment context to be uniquely identified. The lab is correct.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-04",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c",
+      "answer": "**The reviewer's objection is wrong here.** Lack of overlap defeats *nonparametric* identification, but additivity is a structural restriction that links cells, and the question grants it as externally guaranteed at all four contexts.\n\nWrite p(a,b) = f(a) + g(b). Then\n\np(1,1) = p(1,0) + p(0,1) \u2212 p(0,0) = 0.4 + 0.5 \u2212 0.2 = **0.7**\n\nbecause the three observed cells pin down f(0), f(1)\u2212f(0), and g(1)\u2212g(0); no interaction term remains to be estimated. The same-mechanism premise transports this to deployment.\n\n**What follows:** deployment failure probability is point-identified at 0.7 \u2014 a sharp point, not a bound. It lies in [0,1], so the additive model is internally coherent.\n\n**Caveat:** the 2\u00d72 design with three cells has zero degrees of freedom, so no-interaction is untestable from the source data; identification rests entirely on the engineering guarantee. If any interaction exists, p(1,1) is only bounded by [max(0.4,0.5), 1].",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Source means do not pin down f(0) separately without a normalization. Claimed fallback [max(.4,.5),1] bound with interactions requires an unprovided monotonicity assumption; unrestricted bound is[0,1]. Main .7 result under additivity is correct."
+      ]
+    },
+    {
+      "item": "b28-04",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c",
+      "answer": "**The reviewer's inference is incorrect.** Lack of source support at (1,1) blocks *nonparametric* identification, but the problem supplies a structural restriction that closes the gap. Under additivity,\n\n- f(0)+g(0) = 0.2\n- f(1)+g(0) = 0.4\n- f(0)+g(1) = 0.5\n\nHence f(1)\u2212f(0) = 0.2 and g(1)\u2212g(0) = 0.3, so\n\nP(fail | 1,1) = f(1)+g(1) = 0.4 + 0.5 \u2212 0.2 = **0.7**.\n\nThe three observed cells exactly determine the three free parameters; the missing cell is a linear combination of them, so it is point-identified with no residual uncertainty. The value is a legitimate probability (0 \u2264 0.7 \u2264 1), so additivity is at least consistent.\n\n**What follows for deployment:** since the same conditional mechanism holds in both populations and only the context changes, deployment failure probability is 0.7\u2014substantially worse than any source context. Caveats: identification is entirely assumption-driven; with three equations and three unknowns, additivity is untestable from source data, so the conclusion is only as credible as the engineering guarantee of no A\u00d7B interaction.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-03",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96",
+      "answer": "The objection is incorrect for the deployment target. Let  \n\\(p_{ab}=P(\\text{failure}\\mid A=a,B=b)\\). Additivity gives  \n\\(p_{ab}=f(a)+g(b)\\). We know  \n\\(p_{00}=0\\) and \\(p_{11}=0\\). Since failure probabilities are valid at all four contexts, \\(p_{01},p_{10}\\ge 0\\).\n\nNow:\n\\[\np_{01}+p_{10}\n=[f(0)+g(1)]+[f(1)+g(0)]\n=[f(0)+g(0)]+[f(1)+g(1)]\n=p_{00}+p_{11}=0.\n\\]\nThus two nonnegative quantities sum to zero, so\n\\[\np_{01}=p_{10}=0.\n\\]\nTherefore deployment failure probability is exactly zero and is identified, even though the separate functions \\(f,g\\) are not uniquely identified in absolute level.\n\nThe reviewer conflates identifying the component functions with identifying the deployment probability. Under additivity, nonnegativity, and the two known zero contexts, the target \\(p(0,1)\\) is pinned down exactly.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-03",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96",
+      "answer": "The objection is partly correct but does not defeat the target conclusion.\n\nLet \\(p_{ab}=f(a)+g(b)\\). The supplied facts imply\n\n\\[\nf(0)+g(0)=0,\\qquad f(1)+g(1)=0.\n\\]\n\nFor the unobserved combinations,\n\n\\[\np_{01}=f(0)+g(1),\\qquad p_{10}=f(1)+g(0).\n\\]\n\nUsing the two zero equations, \\(g(1)=-f(1)\\) and \\(g(0)=-f(0)\\), so\n\n\\[\np_{01}=f(0)-f(1),\\qquad p_{10}=f(1)-f(0)=-p_{01}.\n\\]\n\nBecause the additive mechanism is a valid probability at all four contexts, both \\(p_{01}\\ge 0\\) and \\(p_{10}\\ge 0\\). Since they are negatives of each other, both must equal zero. Hence deployment\u2019s failure probability is exactly zero.\n\nThe separate functions are indeed not identified: an additive shift can be moved between \\(f\\) and \\(g\\) without changing any \\(p_{ab}\\). But the particular target \\(p_{01}\\) is identified by zero outcomes on the diagonal, additivity, and probability nonnegativity. The reviewer confuses nonidentifiability of the decomposition with nonidentifiability of the target.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-02",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f",
+      "answer": "No, the conclusion does not follow. The additive model \\(P(\\text{fail}|A,B)=f(A)+g(B)\\) gives two equations from the observed contexts\u2014\\(f(0)+g(0)=0.2\\) and \\(f(1)+g(1)=0.8\\)\u2014but leaves four unknown parameters. Without further constraints, the deployment rate \\(f(0)+g(1)\\) is not uniquely determined; it can range from 0 to 1. Two compatible mechanisms that match the source data yet yield different deployment probabilities:\n\n1. \\(f(0)=0.2,\\; g(0)=0,\\; f(1)=0,\\; g(1)=0.8\\) \u2192 deployment \\(P = 0.2+0.8 = 1.0\\).\n2. \\(f(0)=0,\\; g(0)=0.2,\\; f(1)=0.8,\\; g(1)=0\\) \u2192 deployment \\(P = 0+0 = 0\\).\n\nAll values lie in \\([0,1]\\). Observing each feature value separately does not guarantee identifiability under additivity alone.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-04",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c",
+      "answer": "The reviewer is mistaken. Under the additive, no-interaction model \\(P(\\text{fail} \\mid A,B) = f(A) + g(B)\\), the three exact source probabilities give a fully determined system:\n\n- \\((0,0): f(0) + g(0) = 0.2\\)\n- \\((1,0): f(1) + g(0) = 0.4\\)\n- \\((0,1): f(0) + g(1) = 0.5\\)\n\nThe deployment context \\((1,1)\\) is then \\(P(1,1) = f(1) + g(1)\\). Using the first three equations,  \n\\(f(1)+g(1) = [f(1)+g(0)] + [f(0)+g(1)] - [f(0)+g(0)] = 0.4 + 0.5 - 0.2 = 0.7\\).\n\nThus, with exact source means and the guaranteed additive structure, the deployment failure probability is **identified exactly as 0.7**. The absence of direct source observations at \\((1,1)\\) does not prevent identification; the structural assumption logically forces a unique value. The only caveat is that this conclusion rests entirely on the engineering knowledge of additivity\u2014if that assumption were doubted, the parameter would indeed be unidentified, but as stated it holds perfectly.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-04",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c",
+      "answer": "The reviewer is incorrect under the stated assumptions. Additivity supplies the structure needed to identify the unsupported context:\n\n\\[\nP_{11}-P_{10}=P_{01}-P_{00}\n\\]\n\nbecause the effect of \\(B\\) cannot depend on \\(A\\). Equivalently,\n\n\\[\nP_{11}=P_{10}+P_{01}-P_{00}\n      =0.4+0.5-0.2\n      =0.7.\n\\]\n\nThus, exact source means plus globally valid additivity identify the deployment failure probability as **0.70 (70%)**, despite the absence of source observations at \\((1,1)\\). Lack of support would preclude identification without such structural information, but it does not do so here.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-05",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0",
+      "answer": "The conclusion does not follow.\n\n**What is genuinely fixed:** P(fail | A=0,B=0) = 0 and P(fail | A=1,B=1) = 0 are true population values, and because 0 is a boundary, no \"cancellation\" story is needed to explain them\u2014they are simply zero. Also, by assumption, P(fail | A=0,B=1) takes the same value in deployment as it would in the source population *if that context existed there*. The mechanism is transferable.\n\n**What is not fixed:** The source contains no (0,1) instances, so P(fail | 0,1) is entirely unconstrained by the data. It could be 0, 0.5, or 1. Bounds tell us only that it lies in [0,1].\n\n**The hidden assumption:** The lab's inference (\"both values appear; each observed combination is safe; therefore the new combination is safe\") silently presumes failure probability at (0,1) is determined by outcomes at (0,0) and (1,1)\u2014an additivity, monotonicity, or \"no interaction\" relation across contexts. The problem explicitly forbids exactly this. The boundary-probability argument rules out cancellation *within* an observed cell; it says nothing about an unobserved cell.\n\nVerdict: unsupported. Deployment failure probability is unidentified.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-04",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c",
+      "answer": "The reviewer\u2019s argument is incorrect. While non-parametric identification normally fails without observational support at the target context (a positivity violation), the verified structural assumption of additivity overcomes this limitation. \n\nBecause the conditional mechanism is invariant and strictly additive\u2014$P(\\text{Failure}|A,B) = f(A) + g(B)$\u2014we can use the exact source probabilities to solve for the missing context algebraically:\n\n*   $f(0) + g(0) = 0.2$ (from $A=0, B=0$)\n*   $f(1) + g(0) = 0.4$ (from $A=1, B=0$)\n*   $f(0) + g(1) = 0.5$ (from $A=0, B=1$)\n\nThe deployment probability at $(1,1)$ is $f(1) + g(1)$. This is perfectly identified by adding the probabilities of $(1,0)$ and $(0,1)$, then subtracting the baseline $(0,0)$:\n\n$[f(1) + g(0)] + [f(0) + g(1)] - [f(0) + g(0)] = f(1) + g(1)$\n\n$0.4 + 0.5 - 0.2 = 0.7$\n\nThus, the deployment failure probability is exactly **0.7**. The reviewer erred by applying a non-parametric common support requirement to a strongly constrained, additive structural model.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-05",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0",
+      "answer": "**The conclusion does not follow.**\n\n*What is a fact about bounds.* Zero is indeed a boundary: if the failure probability at a context is exactly 0, no sub-component there can be negative, so no positive contribution is being masked. This rules out cancellation **within** (0,0) and within (1,1).\n\n*What is an assumption.* Extending that to (0,1) is a claim relating outcomes at *different* feature pairs. The stated setup grants no such relation: no additivity (which would give p(0,1)=p(0,0)+p(1,1)\u2212p(0,0,baseline)-type constraints), no monotonicity, no smoothness or Lipschitz bound, no parametric form. Invariance of the conditional mechanism transports the failure function from source to deployment, but that function is simply **unidentified off the observed support**.\n\n*Consequence.* Marginal coverage (\"both values appear\") is not joint coverage; (0,1) never occurs in the source. So p(0,1) is only constrained to [0,1] \u2014 it may be 1. Zero source failures give an identification gap, not a safety guarantee; the lab must either assume a cross-context restriction explicitly or test (0,1) directly.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Malformed parenthetical additive-cell identity; arbitrary component contributions need not be nonnegative merely because their sum is a probability. Main absence-of-cross-context-information conclusion is correct."
+      ]
+    },
+    {
+      "item": "b28-05",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0",
+      "answer": "The lab\u2019s conclusion is invalid. \n\nThe argument correctly identifies a **fact about probability bounds**: because probabilities are strictly bounded in $[0,1]$, $P(F|0,0)=0$ and $P(F|1,1)=0$ guarantee there are no negative probabilities cancelling positive ones *within* those specific source contexts. \n\nHowever, the lab relies on a false **assumption relating outcomes at different contexts**. They assume that because the individual feature values A=0 and B=1 are safe in the source, their novel combination (0,1) must be safe in deployment. The premise explicitly forbids assuming additivity, smoothness, or any mathematical relation across different feature pairs. Consequently, the conditional probability $P(F|0,1)$ is wholly independent of the source probabilities. \n\nThe underlying failure mechanism could easily behave like an XOR logic gate\u2014failing if and only if the two features differ. Under an XOR mechanism, the source failure probabilities are exactly zero, but the deployment failure probability is exactly one. Without relational assumptions linking distinct contexts, observing the source places absolutely no constraint on $P(F|0,1)$, which could be anything in $[0,1]$.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-05",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0",
+      "answer": "The conclusion does not follow.\n\nProbability bounds imply only that the failure probabilities at the two observed contexts cannot be below zero:\n\\[\nP(F=1\\mid 0,0)=P(F=1\\mid 1,1)=0.\n\\]\nThus no negative probability within either context can cancel failures\u2014but that fact says nothing about the distinct context \\((0,1)\\).\n\nRepresenting feature values \\(0\\) and \\(1\\) separately is not the same as representing their joint configuration. Without additivity, monotonicity, smoothness, or another cross-context assumption, \\(P(F=1\\mid0,1)\\) may be any value in \\([0,1]\\). For example, the mechanism \u201cfail exactly when \\(A=0,B=1\\)\u201d has zero failure at both source contexts and probability \\(1\\) in deployment, while remaining identical across environments.\n\nTherefore, boundary probabilities eliminate one kind of within-context cancellation, not the possibility of context-specific failure. Extrapolation to the unobserved feature pair requires an explicit structural assumption.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b28-05",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0",
+      "answer": "The lab\u2019s conclusion is unjustified. The fact that failure probabilities are exactly zero at (0,0) and (1,1) simply means those two conditional probabilities lie at the lower boundary of \\([0,1]\\). Because no additivity, smoothness, monotonicity, or any cross\u2011context relation is assumed, the failure probability at the unobserved combination (0,1) is completely unconstrained\u2014it could be any value in \\([0,1]\\). Boundary constraints only force components to be zero under an assumed decomposition (e.g., additive contributions from each feature), but that hidden assumption is precisely what the setup explicitly forbids. Both feature values being \u201crepresented\u201d in the source does not logically link distinct \\((A,B)\\) pairs; each conditional failure probability is free from the others. The lab\u2019s reasoning erroneously imports a compositional structure that goes beyond the bare fact that probabilities lie between 0 and 1.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    }
+  ]
+}

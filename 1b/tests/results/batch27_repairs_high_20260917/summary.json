@@ -1,0 +1,10 @@
+{
+  "records": 25,
+  "valid": 24,
+  "target_pass": 24,
+  "excluded": 1,
+  "recorded_cost": 0.72807722029944,
+  "audit_type": "author-agent, not independent human",
+  "exact_tuple_and_prompt_hash_check": "passed",
+  "scope": "Target judgments; identified subsidiary errors preserved separately."
+}

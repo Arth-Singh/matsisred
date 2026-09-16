@@ -1,0 +1,15 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+auth.json
+credentials.json
+*.stderr
+1b/tests/smoke/
+# Published evidence is explicitly tracked. New API output stays local.
+1b/tests/results/*

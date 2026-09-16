@@ -1,0 +1,39 @@
+{
+  "started_at": "2026-09-16T16:38:17.655580+00:00",
+  "arguments": {
+    "items": "tests/sets/explanation_candidates",
+    "models": "openai/gpt-6-astra-pro",
+    "n": 1,
+    "run": "explanation_candidates_astra_pro_high_20260917",
+    "max_tokens": 32000,
+    "reasoning_effort": "high",
+    "concurrency": 3,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b25-01",
+      "type": "identification-guarantee",
+      "prompt": "A lab randomizes models between training regimes R=0 and R=1, with positive assignment probabilities. The complete causal graph for an intermediate binary flag M and later outcome Y is R \u2192 M \u2192 Y together with R \u2192 Y, with mutually independent background disturbances. Only M=0 models are archived. The archive records all three variables without error and can be made arbitrarily large. The regime composition of the archive has not been reported; flag computation is allowed to be deterministic.\n\nA reviewer incorrectly calls M a collider. The lab replies: \u201cM is a mediator and there is no hidden mediator\u2013outcome confounding. Those facts, together with random assignment of R, guarantee that the archive identifies the causal effect of changing R while intervening to keep M at zero. We only need more archived data to estimate it accurately.\u201d\n\nDoes this identification guarantee follow from the supplied facts? Assess the correction and the positive conclusion separately. Give a short possible mechanism if needed; do not assume additional facts about archive composition. At most 180 words.",
+      "path": "tests/sets/explanation_candidates/b25-01.md",
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969"
+    },
+    {
+      "id": "b25-04",
+      "type": "identification-guarantee",
+      "prompt": "A lab transfers an AI safety evaluation from a source population to a target population. Two binary context features A and B are recorded perfectly. The lab knows that the conditional outcome mechanism for Y given the complete pair (A,B) is identical in source and target; there is no concept shift, measurement error or hidden omitted feature. Unlimited labeled source data and unlimited unlabeled target data are available. Both possible values of each feature occur in the source. The lab has not supplied a joint coverage condition.\n\nThe lab argues: \u201cEvery relevant feature value is represented, and the outcome relationship does not change across populations. Therefore we can always identify target mean Y by reweighting the source to match the target feature distribution. Any remaining limitation is finite-sample accuracy.\u201d\n\nDoes that conclusion follow? If not, give a tiny source/target example preserving all stated facts and explain what more is needed. At most 190 words.",
+      "path": "tests/sets/explanation_candidates/b25-04.md",
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833"
+    },
+    {
+      "id": "b27-02",
+      "type": "repair-audit",
+      "prompt": "A lab studies the causal effect of binary training choice T on outcome Y. The complete original graph is U \u2192 T, U \u2192 Y, T \u2192 M and M \u2192 Y; U is unobserved. M intercepts every causal effect of T on Y, but its observed values determine T exactly. Both training choices occur.\n\nTo repair missing overlap, the lab replaces the archived representation with randomized readout N. A sensor produces N from M using fresh independent randomness, chosen so both binary N values occur with positive probability under each T. The model still computes Y using original M; the sensor is downstream instrumentation and does not change that computation. Unlimited, error-free records of T, N and Y are collected. No other functional restrictions are known.\n\nA researcher says: \u201cOur original mediator satisfied the front-door graphical conditions; its only problem was support. The sensor fixes support without adding confounding, so front-door adjustment using N identifies the training effect. Added randomness affects precision, which unlimited data removes.\u201d\n\nAssess this repair. Explain whether the graphical and support requirements are now jointly satisfied. At most 220 words.",
+      "path": "tests/sets/explanation_candidates/b27-02.md",
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402"
+    }
+  ],
+  "models": [
+    "openai/gpt-6-astra-pro"
+  ]
+}

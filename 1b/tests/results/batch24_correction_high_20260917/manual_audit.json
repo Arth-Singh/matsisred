@@ -1,0 +1,259 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b24-01",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "cb323c7dd80e60e8dd1e3fa36c518077095e397519d36b4c5e2d636a9645a098",
+      "answer": "The lab\u2019s reply is completely correct and successfully refutes the reviewer. \n\nFirst, the reviewer\u2019s diagnosis is mistaken: $M$ is a mediator on the path $R \\rightarrow M \\rightarrow Y$, not a collider. A collider requires two incoming arrows on a specific path, which $M$ lacks. \n\nSecond, although conditioning on a mediator *can* induce collider bias in some causal graphs, this only occurs when there are unmeasured confounders affecting both the mediator and the outcome. Because the premise guarantees all background disturbances are mutually independent (meaning no hidden common causes), restricting the data to $M=0$ does not open any spurious backdoor paths between $R$ and $Y$.\n\nThird, the lab accurately states what can be learned. By comparing $R=1$ and $R=0$ outcomes within the $M=0$ archive, the lab calculates $E[Y \\mid R=1, M=0] - E[Y \\mid R=0, M=0]$. Given the randomized $R$ and the absence of $M \\rightarrow Y$ confounding, this conditional difference exactly identifies the Controlled Direct Effect (CDE) of $R$ on $Y$ when intervening to set $M=0$. \n\nFinally, the lab rightly notes that the total effect of $R$ is unidentifiable. Finding the total effect requires computing the average of $Y$ across the natural distribution of $M$. Because the $M=1$ outcome surface is missing, only the direct-effect conclusion is mathematically supported.",
+      "target_grade": "provisional_fail",
+      "note": "Unconditional CDE claim needs within-archive treatment support; original wording may pragmatically imply a comparison exists. Not submission-ready. Accepts identification without support caveat.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-01",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "cb323c7dd80e60e8dd1e3fa36c518077095e397519d36b4c5e2d636a9645a098",
+      "answer": "**The diagnosis is right.** A collider needs two arrowheads; in R \u2192 M \u2192 Y with R \u2192 Y and independent disturbances, M has a single parent. Selecting on M=0 therefore does not select on Y's disturbance, so no spurious R\u2013Y association is manufactured. The reviewer's \"collider bias\" label is wrong. (Conditioning on *Y* would be collider-like; conditioning on M would also bias things if M and Y shared a hidden cause \u2014 but both are excluded by the granted graph.)\n\n**The positive claim is right but needs sharpening.**\n\n1. What is identified is the *controlled* direct effect at m=0: E[Y(1,0)] \u2212 E[Y(0,0)], recoverable because Y = f(R,M,\u03b5_Y) with \u03b5_Y \u2aeb (R,M). It requires P(M=0 | R=r) > 0 for both regimes.\n2. It is *not* the natural/pure direct effect, which averages over the distribution of M(0) and so needs the m=1 surface. Nor is it \"the\" direct effect: with R\u00d7M interaction, CDE(1) may differ in size or sign, and it too is unavailable.\n3. The reply's mechanism-talk (\"blocks the indirect route\") is loose. d-separation concerns association, not identification; what licenses the interpretation is the absence of M\u2013Y confounding, not path-blocking per se.\n4. Since every archived record has M=0, P(M | R) is unestimable \u2014 correctly conceding the total effect, and also ruling out mediation decomposition.\n\n**Verdict:** a sound correction, modulo relabeling the estimand as the m=0 controlled direct effect.",
+      "target_grade": "qualified",
+      "note": "Unconditional CDE claim needs within-archive treatment support; original wording may pragmatically imply a comparison exists. Not submission-ready. Explicitly states both-regime positivity requirement.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-01",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "cb323c7dd80e60e8dd1e3fa36c518077095e397519d36b4c5e2d636a9645a098",
+      "answer": "**Verdict: largely correct, with one label to sharpen.**\n\n*Not collider bias.* Right. In the stated graph M has a single parent, R. Conditioning on M cannot open a back\u2011door path because there is nothing else pointing into M, and the disturbances are independent. Selection on a mediator is still a genuine problem for the total effect (over\u2011adjustment/selection distortion), so the reviewer's worry is legitimate even though the mechanism named is wrong\u2014and the lab concedes exactly that.\n\n*What is identified.* Write Y = f(R, M, U_Y). Because R is randomized and U_M \u22a5 U_Y, within the archive U_Y is independent of R, so\nE[Y | R=r, M=0] = E[f(r, 0, U_Y)] = E[Y | do(R=r), do(M=0)].\nHence the archived difference between regimes equals the **controlled direct effect with M set to 0**, CDE(0). The lab's claim holds.\n\n*Precision needed.* It should say \"controlled direct effect at M=0,\" not \"the direct effect.\" The natural direct effect, CDE(1), and any effect on M\u2011switchers are not recoverable, since the M=1 surface and the absolute rates P(M=0 | R) are absent. CDE(0) may also be of narrow interest if M=1 is common.\n\n*Total effect.* Correctly declared unidentified.\n\n*Fragility.* The whole argument rests on the granted independence of disturbances; any shared cause of M and Y would make M a collider under selection and void the conclusion.",
+      "target_grade": "provisional_fail",
+      "note": "Unconditional CDE claim needs within-archive treatment support; original wording may pragmatically imply a comparison exists. Not submission-ready. Accepts identification without support caveat.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-02",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4",
+      "answer": "**Assessment.** The reply is correct under the stated model.\n\n*Collider claim:* In R \u2192 M \u2192 Y with R \u2192 Y, M is a mediator on the R\u2013Y path and a common effect only of R (and its own disturbance). Selecting on M=0 conditions on a descendant of R, not on a collider with an unblocked back-door to Y, because the disturbances are mutually independent: the disturbance driving Y is independent of both R and M's disturbance. Hence conditioning on M opens no spurious path.\n\n*Direct-effect claim:* Write Y = f(R, M, U_Y). Since U_Y \u22a5 (R, M), E[Y | R=r, M=0] = E[f(r, 0, U_Y)] = E[Y(r, m=0)]. So the archive's regime-specific means equal the interventional means with M held at 0, and their difference is the controlled direct effect CDE(0). This follows.\n\n*Distinction:* The total effect E[Y(1)] \u2212 E[Y(0)] lets M respond naturally, requiring P(M | R) and E[Y | R, M=1] \u2014 neither observable in an archive containing only M=0 records. It is therefore not identified from the archive alone, exactly as the lab concedes. Likewise natural (in)direct effects are not identified.",
+      "target_grade": "pass",
+      "note": "Correctly identifies CDE under explicit support and independent disturbances.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-02",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4",
+      "answer": "**The reply is correct under the stated model.**\n\n**Why M is not a collider here.** M's only parents are R and its own disturbance; Y's disturbance is independent of M's. So M is a non-collider on R\u2192M\u2192Y, and conditioning on M=0 opens no back-door path between R and Y. There is no unblocked path from R to Y other than the direct edge once M is fixed.\n\n**What is identified.** Because R is randomized and M has no unmeasured common cause with Y,\nE[Y | R=r, M=0] = E[Y | do(R=r), do(M=0)].\nHence CDE(0) = E[Y | R=1, M=0] \u2212 E[Y | R=0, M=0], consistently estimable since both regimes occur with positive probability in the archive.\n\n**What is not.** This is the effect of switching regimes *while forcing* M=0. Letting M respond naturally \u2014 the total effect, or the natural direct/indirect effects \u2014 requires E[Y | R=r, M=1] and P(M | R=r) in the source population. The archive truncates M=1 entirely, so those quantities are unidentified without extra assumptions (e.g., no R\u2192M effect, or homogeneity/no-interaction constraints).",
+      "target_grade": "pass",
+      "note": "Correctly identifies CDE under explicit support and independent disturbances.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-01",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "cb323c7dd80e60e8dd1e3fa36c518077095e397519d36b4c5e2d636a9645a098",
+      "answer": "The lab\u2019s reply is correct. Under the stated graph (R \u2192 M \u2192 Y plus R \u2192 Y) with mutually independent background disturbances and randomized R, M is a pure mediator\u2014not a collider. Conditioning on M does not induce collider bias because there is no unmeasured common cause of M and Y; the independent disturbances ensure that Y(r,0) is independent of M(r) given R. Hence, among the archived M=0 records, the contrast E[Y|R=1, M=0] \u2013 E[Y|R=0, M=0] unbiasedly identifies the controlled direct effect of R on Y when M is held at zero. This is exactly what the lab claims: they can learn the direct effect while the total effect remains unidentified because the M=1 surface is missing. The reviewer\u2019s collider-bias concern is a misdiagnosis that would apply only if M and Y shared an unobserved confounder, which the graph explicitly rules out.",
+      "target_grade": "provisional_fail",
+      "note": "Unconditional CDE claim needs within-archive treatment support; original wording may pragmatically imply a comparison exists. Not submission-ready. Accepts identification without support caveat.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-02",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4",
+      "answer": "The lab is correct on all points. \n\nFirst, in the graph $R \\rightarrow M \\rightarrow Y$ with $R \\rightarrow Y$, $M$ is a mediator, not a collider, because only $R$ points into it. Since the background disturbances are mutually independent, there is no unmeasured confounding between $M$ and $Y$. Consequently, conditioning on $M=0$ does not induce collider bias.\n\nSecond, the lab's direct-effect conclusion follows. Without confounding, the interventional expectation $E[Y|do(R=r, M=0)]$ equals the observational expectation $E[Y|R=r, M=0]$. Therefore, the difference between the archive's regime-specific means exactly identifies the Controlled Direct Effect (CDE) of $R$ on $Y$ when intervening to fix $M$ at $0$.\n\nFinally, this CDE differs fundamentally from letting $M$ respond naturally to $R$. The Natural Direct Effect (NDE) measures the effect of changing $R$ while $M$ behaves as it *naturally* would have under a baseline regime. Because the total effect and the NDE both depend on outcomes where $M=1$, the archive\u2014which strictly censors $M=1$ data\u2014cannot identify effects that allow $M$ to vary naturally.",
+      "target_grade": "pass",
+      "note": "Correctly identifies CDE under explicit support and independent disturbances.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-02",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4",
+      "answer": "The lab\u2019s controlled-direct-effect conclusion follows. Let \\(M_r=f_M(r,U_M)\\) and \\(Y_{r,m}=f_Y(r,m,U_Y)\\). Randomization and independent disturbances imply \\(U_Y\\perp (R,U_M)\\). Thus, for archived records,\n\n\\[\nE[Y\\mid R=r,M=0]\n=E[Y_{r,0}\\mid R=r,M_r=0]\n=E[Y_{r,0}],\n\\]\n\nbecause the conditioning event depends only on \\(R\\) and \\(U_M\\). Therefore the archive contrast identifies\n\n\\[\nE[Y_{1,0}-Y_{0,0}],\n\\]\n\nthe controlled direct effect of \\(R\\) when \\(M\\) is fixed at zero. The stated positivity ensures both archive means are defined.\n\nIn the supplied graph, \\(M\\) is indeed a mediator, not a collider. Conditioning on a mediator can create selection bias in other causal structures, but the independent-disturbance assumption prevents that problem for this controlled contrast.\n\nBy contrast, if \\(R\\) changes while \\(M\\) responds naturally, the relevant total effect is\n\n\\[\nE[Y_{1,M_1}-Y_{0,M_0}],\n\\]\n\nwhich includes the \\(R\\to M\\to Y\\) pathway. The archive contrast generally does not identify that total effect without additional assumptions.",
+      "target_grade": "pass",
+      "note": "Correctly identifies CDE under explicit support and independent disturbances.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-03",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "118ffce8cb265c74515a25c0a5d3c05f2b009c70cd8568fd84d17ae08d993f0c",
+      "answer": "**No.** The estimate identifies the controlled direct effect CDE(0) = E[Y(1,0) \u2212 Y(0,0)]: the effect of R with M *forced* to 0. The lead's question is different: for models with R=0 and M=0, what is E[Y(1, M(1)) \u2212 Y(0,0) | R=0, M=0]? Here M(1) is whatever M becomes under R=1\u2014*not* held at zero. That \"M=0 currently\" removes the need for intervention is a confusion: the issue is not the current value of M but its value *after* the switch. Switching R can flip M, and the M\u2192Y path then contributes. The quantity sought is a total effect in the subgroup with M(0)=0, which combines direct and indirect pathways.\n\n**Mechanism:** Let U_M ~ Bernoulli(\u00bd), M = R\u00b7U_M, Y = R + 5M + U_Y (independent disturbances).\n- Under R=0 every model has M=0. Under R=1, archived (M=0) models are those with U_M=0.\n- Archive: E[Y|R=1,M=0] \u2212 E[Y|R=0,M=0] = 1 = CDE(0). Correct.\n- Actual switch of R=0 models to R=1: half acquire M=1, so expected change = 1 + 5\u00b7\u00bd = 3.5.\n\nThe CDE (1) badly understates the practical effect (3.5). Moreover, because the archive contains no M=1 records, the needed quantity E[Y(1,M(1))] is not identified from it at all.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes natural regime switch in selected subgroup from intervention fixing mediator.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-03",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "118ffce8cb265c74515a25c0a5d3c05f2b009c70cd8568fd84d17ae08d993f0c",
+      "answer": "**No.** The estimate answers a different question.\n\nThe CDE you identified is\nE[Y | R=1, do(M=0)] \u2212 E[Y | R=0, do(M=0)]:\nthe regime contrast *with M pinned at 0 in both arms*. The project lead's question is the effect of switching regime while M is left free to react \u2014 for models that happened to have M=0 under R=0. Having M=0 *now* does not mean M would still be 0 under R=1. Once R changes, the R \u2192 M \u2192 Y pathway is live, so the switch delivers direct plus indirect effect, not the CDE.\n\n**Mechanism.** Under R=0, M=0 always; under R=1, M=1 with probability 0.5. Let Y = R + 3M (plus mean-zero noise). Both R values and M=0 occur with positive frequency, so the CDE is estimable: holding M=0, Y = R, giving CDE = 1.\n\nBut take an archived R=0 model (necessarily M=0, so Y = 0). Switch it to R=1 with M free: E[Y] = 1 + 3(0.5) = 2.5. The expected change is 2.5, not 1 \u2014 the extra 1.5 is the indirect effect through the flag flipping.\n\nSo \"no intervention is needed\" is exactly why the CDE doesn't apply: the CDE's meaning *depends* on that intervention. Unconstrained switching requires the total (or natural) effect.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes natural regime switch in selected subgroup from intervention fixing mediator.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-01",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "cb323c7dd80e60e8dd1e3fa36c518077095e397519d36b4c5e2d636a9645a098",
+      "answer": "The lab is substantively correct under the stated assumptions. \\(M\\) is a mediator, not a collider on the causal path \\(R\\to M\\to Y\\). Conditioning on \\(M=0\\) therefore blocks the mediated route rather than opening a collider path. More precisely, the archive is a selected sample, and the estimand changes.\n\nLet \\(Y_{r,m}\\) denote the outcome under \\(do(R=r,M=m)\\), and \\(M_r\\) the potential mediator under \\(R=r\\). With structural equations\n\\[\nM=f_M(R,U_M),\\qquad Y=f_Y(R,M,U_Y),\n\\]\nrandomization and independence of \\(U_M\\) and \\(U_Y\\) imply that \\(M_r=0\\) provides no information about \\(Y_{r,0}\\). Hence\n\\[\nE[Y\\mid R=r,M=0]\n=E[Y_{r,0}\\mid M_r=0]\n=E[Y_{r,0}].\n\\]\nThus the archived contrast\n\\[\nE[Y\\mid R=1,M=0]-E[Y\\mid R=0,M=0]\n\\]\nidentifies the controlled direct effect at \\(M=0\\), namely\n\\[\nE[Y_{1,0}-Y_{0,0}].\n\\]\n\nIt does not identify the total effect, the controlled direct effect at \\(M=1\\), or a natural direct effect, because outcomes under \\(M=1\\) are absent. Conditioning on a mediator can produce collider or selection bias when mediator and outcome share unmeasured causes, but that possibility is excluded here. The reviewer is right only that the archive cannot answer the original total-effect question.",
+      "target_grade": "provisional_fail",
+      "note": "Unconditional CDE claim needs within-archive treatment support; original wording may pragmatically imply a comparison exists. Not submission-ready. Accepts identification without support caveat.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-03",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "118ffce8cb265c74515a25c0a5d3c05f2b009c70cd8568fd84d17ae08d993f0c",
+      "answer": "No. The archived contrast is a controlled direct effect: compare regimes while imposing `do(M=0)`, so the `R\u2192M\u2192Y` path is disabled. The lead\u2019s switch is `do(R=1)` with `M` free; the relevant contrast is closer to  \n`E[ Y(1,M(1)) \u2212 Y(0,0) | currently R=0,M=0 ]`, generally different. Having `M=0` before switching does not imply the counterfactual `M` after switching would remain 0; `M` is downstream of `R`.\n\nMechanism: let `M = R XOR U`, with independent `U`, `0<P(U=1)<1`; let `Y = \u03b2M + \u03b5`, no direct `R` effect. The `M=0` archive contains `R=0,U=0` and `R=1,U=1`; its regime mean difference is 0, matching the controlled direct effect holding `M=0`. But archived `R=0,M=0` units have `U=0`; after switching to `R=1`, they become `M=1`, so `Y` rises by `\u03b2` through the indirect path. The estimate justifies the lead only if `M(1)` remains 0 or indirect effects are absent.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes natural regime switch in selected subgroup from intervention fixing mediator.",
+      "secondary_caveats": [
+        "Illustrative Y=beta M+epsilon mechanism omits stipulated direct R\u2192Y edge; target distinction correct and witness repaired by adding nonzero direct term."
+      ]
+    },
+    {
+      "item": "b24-04",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "cdad4990499f8a174a11809e610991346eba3bb0f66cce35e69bb4285e944d5d",
+      "answer": "",
+      "target_grade": "excluded",
+      "note": "Correctly uses Y independent of M conditional on R; filtering preserves regime means.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-04",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "cdad4990499f8a174a11809e610991346eba3bb0f66cce35e69bb4285e944d5d",
+      "answer": "The objection fails under this model. In the graph, M is caused only by R (plus its own independent disturbance), and Y is caused only by R (plus its own independent disturbance). Because there is no arrow M \u2192 Y and no shared cause, M and Y are d-separated given R: within a fixed regime, M is independent of Y. Selecting M=0 therefore does not change the outcome distribution within either regime\u2014P(Y | R=r, M=0) = P(Y | R=r) for r = 0, 1.\n\nSince randomization makes P(Y | R=r) equal the interventional distribution P(Y | do(R=r)), the archived regime-specific means equal the source-population means under each regime, and their difference identifies the average causal effect. Positivity of both R values in the archive guarantees these conditional means are well defined and estimable with unlimited data.\n\nThe reviewer's general warning about post-treatment conditioning is valid when the conditioned variable is a mediator or shares causes with the outcome (collider bias). Here neither holds, so conditioning on M is harmless\u2014the concern must be argued from a different graph, not this one.",
+      "target_grade": "pass",
+      "note": "Correctly uses Y independent of M conditional on R; filtering preserves regime means.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-03",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "118ffce8cb265c74515a25c0a5d3c05f2b009c70cd8568fd84d17ae08d993f0c",
+      "answer": "**No, the estimate does not justify the project lead\u2019s inference.** \n\nThe lead confuses the **Controlled Direct Effect** (CDE), which artificially forces $M=0$, with the natural effect of the switch for the subset of models where $M$ is currently $0$. \n\nWhen models currently trained under $R=0$ (where $M=0$) are switched to $R=1$, their intermediate flag $M$ is allowed to react. The CDE strictly isolates the effect of $R$ on $Y$ assuming $M$ is held at $0$. It completely ignores any indirect effect that occurs if the new regime causes $M$ to flip to $1$.\n\n**Mechanism Example:**\nSuppose $R$ dictates batch size ($R=1$ is larger), $M$ is an \"Out-of-Memory\" (OOM) crash flag, and $Y$ is final accuracy. \n\nThe archived models ($M=0$) safely avoided OOM crashes under the smaller batch size ($R=0$). The estimated CDE represents the expected accuracy gain of $R=1$ *if we artificially prevent OOM crashes* (e.g., by intervening to add infinite RAM). \n\nHowever, in a natural switch, the larger batch size of $R=1$ might cause these exact models to OOM crash ($M$ becomes $1$), tanking accuracy. Because the CDE estimate mathematically strips out this indirect mechanism, it cannot predict the result of a natural switch.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes natural regime switch in selected subgroup from intervention fixing mediator.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-02",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4",
+      "answer": "The lab\u2019s reply is correct under the given causal model. Because R is randomized and the background disturbances are mutually independent, conditioning on the mediator M does not introduce collider bias for the controlled direct effect (CDE). In the source population, \\(E[Y \\mid R=r, M=0]\\) equals \\(E[Y \\mid do(R=r, M=0)]\\), the mean outcome when R is set to \\(r\\) and M is held fixed at 0. The archive contains exactly the \\(M=0\\) subpopulation, so the regime-specific means observed there directly estimate these conditional expectations; their difference therefore identifies the CDE at \\(M=0\\).\n\nThis is distinct from the total effect, which lets M respond naturally to a change in R. The total effect is \\(E[Y \\mid do(R=1)] - E[Y \\mid do(R=0)]\\) and requires the marginal distribution of M across regimes. Because the archive retains only \\(M=0\\) cases, it cannot generally identify the total effect\u2014a limitation the lab explicitly acknowledges. The reviewer\u2019s concern about collider bias applies to total-effect estimation, not to the controlled direct effect the lab correctly isolates.",
+      "target_grade": "pass",
+      "note": "Correctly identifies CDE under explicit support and independent disturbances.",
+      "secondary_caveats": [
+        "Final sentence wrongly suggests collider-bias concern applies to total-effect estimation here; graph has no such open collider path. CDE/total-effect target distinction remains correct."
+      ]
+    },
+    {
+      "item": "b24-04",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "cdad4990499f8a174a11809e610991346eba3bb0f66cce35e69bb4285e944d5d",
+      "answer": "No. The objection overgeneralizes a valid warning. In the supplied graph, the only path between \\(M\\) and \\(Y\\) is the fork \\(M \\leftarrow R \\rightarrow Y\\), which is blocked once \\(R\\) is fixed; with independent disturbances, \\(M \\perp Y \\mid R\\). So within each regime,\n\n\\[\nP(Y\\mid R=r,M=0)=P(Y\\mid R=r).\n\\]\n\nSelecting \\(M=0\\) may change the *treatment mix* in the archive, \\(P(R\\mid M=0)\\), but it does not change the outcome distribution inside either fixed regime. Because both \\(R\\) values remain present with positive probability, the archived contrast recovers\n\n\\[\nE[Y\\mid R=1,M=0]-E[Y\\mid R=0,M=0]\n= E[Y\\mid R=1]-E[Y\\mid R=0],\n\\]\n\nwhich equals the source-population average effect by randomization. Post-treatment conditioning is dangerous when it opens a path to \\(Y\\) within arms\u2014via \\(M\\to Y\\), a common cause, or a collider\u2014but none exists here.",
+      "target_grade": "pass",
+      "note": "Correctly uses Y independent of M conditional on R; filtering preserves regime means.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-05",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "b97de4d194a3395c931d6fd6a25891fba386412c84afffbadc7f1316e01a1764",
+      "answer": "The conclusion does not follow. The reviewer is right about one thing: inverse-probability weighting of archived records cannot recover E[Y | R, M=1], because that stratum has zero support in the archive. But identification need not come from reweighting alone.\n\nSince R is randomized, the total effect is E[Y|R=1] \u2212 E[Y|R=0] in the source population. Decompose by M:\n\nE[Y|R=r] = P(M=0|R=r)\u00b7E[Y|R=r,M=0] + P(M=1|R=r)\u00b7E[Y|R=r,M=1].\n\nEach piece is supplied by a different source:\n- P(M=0|R): census \u2192 0.8 and 0.2.\n- E[Y|R, M=0]: archive (selection is on M alone, so within M=0 the archived mean equals the population conditional mean) \u2192 0.3 and 0.6.\n- E[Y|R, M=1]: the verified apparatus property \u2192 1 for both R.\n\nThus\nE[Y|R=0] = 0.8(0.3) + 0.2(1) = 0.44\nE[Y|R=1] = 0.2(0.6) + 0.8(1) = 0.92\n\nTotal effect = 0.92 \u2212 0.44 = 0.48.\n\nIdentification comes from combining randomization, the census, archive conditional means, and the structural guarantee\u2014not from weighting the archive.",
+      "target_grade": "pass",
+      "note": "Correctly combines census, archive and structural outcome information: total effect .48.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-04",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "cdad4990499f8a174a11809e610991346eba3bb0f66cce35e69bb4285e944d5d",
+      "answer": "The objection fails under this specific causal model. While $M$ is a post-treatment variable, conditioning on it only destroys randomization (induces bias) if it is a mediator ($R \\rightarrow M \\rightarrow Y$) or a collider (e.g., $R \\rightarrow M \\leftarrow U \\rightarrow Y$). \n\nIn the lab's complete graph, the only path connecting $M$ and $Y$ is $M \\leftarrow R \\rightarrow Y$. Because all background disturbances are mutually independent, fixing the regime $R$ completely blocks this path. This makes $M$ and $Y$ conditionally independent given $R$ ($Y \\perp\\!\\!\\!\\perp M \\mid R$).\n\nConsequently, selecting $M=0$ does **not** change the outcome distribution within each fixed regime: $P(Y \\mid R=r, M=0) = P(Y \\mid R=r)$. \n\nThis matters because it ensures the archive's regime-specific mean outcomes exactly match the source population's. The lab's estimator, $\\mathbb{E}[Y|R=1, M=0] - \\mathbb{E}[Y|R=0, M=0]$, algebraically reduces to the true source-population effect, $\\mathbb{E}[Y|R=1] - \\mathbb{E}[Y|R=0]$. The reviewer's heuristic about post-treatment variables is generally wise, but it does not apply to this specific, confounder-free graph.",
+      "target_grade": "pass",
+      "note": "Correctly uses Y independent of M conditional on R; filtering preserves regime means.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-05",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "b97de4d194a3395c931d6fd6a25891fba386412c84afffbadc7f1316e01a1764",
+      "answer": "No. The conclusion does not follow once all supplied information is used.\n\nThe archived records alone identify only  \n\\[\nE[Y\\mid R=0,M=0]=0.3,\\qquad E[Y\\mid R=1,M=0]=0.6.\n\\]\nInverse-probability weighting those records cannot infer outcomes in the unobserved \\(M=1\\) stratum. However, the verified apparatus property supplies exactly that information:\n\\[\nE[Y\\mid R=r,M=1]=1.\n\\]\n\nThus the full source-population means are\n\\[\nE[Y\\mid R=0]=(0.8)(0.3)+(0.2)(1)=0.44,\n\\]\n\\[\nE[Y\\mid R=1]=(0.2)(0.6)+(0.8)(1)=0.92.\n\\]\n\nBecause \\(R\\) was randomly assigned, these regime-specific means equal the corresponding interventional means. Therefore the average total effect is\n\\[\nE[Y\\mid do(R=1)]-E[Y\\mid do(R=0)]\n=0.92-0.44=\\boxed{0.48}.\n\\]\n\nThe reviewer is correct about weighting archived data alone, but not about the full setup.",
+      "target_grade": "pass",
+      "note": "Correctly combines census, archive and structural outcome information: total effect .48.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-05",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "b97de4d194a3395c931d6fd6a25891fba386412c84afffbadc7f1316e01a1764",
+      "answer": "**No, the conclusion does not follow.**\n\nThe reviewer is right about one thing: selection on M=0 cannot be repaired by reweighting archived records. Weights can rescale strata that are represented; the M=1 stratum has zero archived support, so no IPW/selection-model adjustment on the archive alone recovers it. If that were the whole story, only the M=0-conditional means would be identified.\n\nBut the identification does not come from weighting. It comes from combining three external facts with the archive:\n\n1. The census gives the marginal M-distribution: P(M=0|R) = 0.8, 0.2.\n2. The apparatus guarantees Y=1 whenever M=1 \u2014 a structural/deterministic property, so E[Y|R,M=1] = 1 without any archived observations.\n3. R is randomized, so E[Y|R=r] = E[Y^r].\n\nLaw of total expectation:\n\n- E[Y|R=0] = 0.8(0.3) + 0.2(1) = 0.44\n- E[Y|R=1] = 0.2(0.6) + 0.8(1) = 0.92\n\n**Total effect = 0.92 \u2212 0.44 = 0.48.**\n\nThe unobserved stratum is identified by design knowledge, not imputed from data \u2014 mediation decomposition is unnecessary, since only the total effect is asked.",
+      "target_grade": "pass",
+      "note": "Correctly combines census, archive and structural outcome information: total effect .48.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-04",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "cdad4990499f8a174a11809e610991346eba3bb0f66cce35e69bb4285e944d5d",
+      "answer": "The objection fails. Under the given causal graph\u2014where R affects both M and Y, no arrow connects M to Y, and all background disturbances are mutually independent\u2014M and Y are conditionally independent given R. This means that within each fixed regime (R=0 or R=1), the distribution of Y is exactly the same whether we consider all records or only those with M=0.  Selecting M=0 therefore does not change the regime-specific mean outcomes; the archive means are unbiased estimates of the source-population means for each regime. Because both R values appear with positive probability in the archive, the difference in archive means remains a valid estimator of the source-population average treatment effect. The reviewer\u2019s concern about conditioning on a post-treatment variable would be valid if M were a collider linking R and Y through an unmeasured common cause, but that is explicitly absent here. Randomization is not destroyed because the selection is independent of the potential outcomes within each treatment arm.",
+      "target_grade": "pass",
+      "note": "Correctly uses Y independent of M conditional on R; filtering preserves regime means.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-05",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "b97de4d194a3395c931d6fd6a25891fba386412c84afffbadc7f1316e01a1764",
+      "answer": "The reviewer\u2019s conclusion does not follow. While they are correct that inverse-probability weighting fails for the archive alone due to a strict positivity violation (zero probability of observing $M=1$), the total effect is still identifiable. \n\nWe overcome the archive's empirical limitation by combining it with the full setup's census data and structural guarantees. Because $R$ is randomly assigned and lacks unobserved confounding, the total effect is $P(Y=1|R=1) - P(Y=1|R=0)$. We calculate this via the Law of Total Probability:\n\n$P(Y=1|R) = P(Y=1|R, M=0)P(M=0|R) + P(Y=1|R, M=1)P(M=1|R)$\n\nThe archive supplies $P(Y=1|R, M=0)$ and the census supplies $P(M|R)$. Crucially, the apparatus physically guarantees $P(Y=1|R, M=1) = 1$, bypassing the need for observed $M=1$ outcomes entirely. \n\nCalculating the expected outcome for each assignment:\n* **$R=0$**: $(0.3 \\times 0.8) + (1 \\times 0.2) = 0.24 + 0.20 = 0.44$\n* **$R=1$**: $(0.6 \\times 0.2) + (1 \\times 0.8) = 0.12 + 0.80 = 0.92$\n\nThe total average treatment effect of $R$ on $Y$ is **$0.48$** ($0.92 - 0.44$).",
+      "target_grade": "pass",
+      "note": "Correctly combines census, archive and structural outcome information: total effect .48.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-05",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "b97de4d194a3395c931d6fd6a25891fba386412c84afffbadc7f1316e01a1764",
+      "answer": "The reviewer\u2019s conclusion does not follow. While inverse\u2011probability weighting restricted to the archive (M=0 records) cannot recover the total effect without M=1 outcome data, the full setup supplies precisely that missing information: the apparatus guarantees Y=1 whenever M=1, and the independent census gives the proportions of M=0 under each treatment.  \nThus, the source\u2011population means are identifiable:  \nE[Y|R=0] = 0.3\u00d70.8 + 1\u00d70.2 = 0.44  \nE[Y|R=1] = 0.6\u00d70.2 + 1\u00d70.8 = 0.92  \nThe average total effect of R on Y is 0.92 \u2013 0.44 = 0.48.  \nThe archive alone is insufficient for standard weighting, but the deterministic Y|M=1 and the census strata sizes bridge the gap, yielding full identification.",
+      "target_grade": "pass",
+      "note": "Correctly combines census, archive and structural outcome information: total effect .48.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b24-03",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "118ffce8cb265c74515a25c0a5d3c05f2b009c70cd8568fd84d17ae08d993f0c",
+      "answer": "The estimate does not justify the inference. The lab correctly identified the *controlled direct effect* (CDE) of switching R while forcing M to remain 0. In the proposed actual switch, however, only R is changed; M is free to respond naturally. Because the causal graph includes R \u2192 M, altering the regime can also change M, which then influences Y through M \u2192 Y. The CDE deliberately excludes this indirect pathway, but the real switch includes it. Models currently with M=0 under R=0 may not stay M=0 when moved to R=1, so their expected Y change is not given by the CDE.\n\n**Example mechanism:** Let R=0 be standard training and R=1 be intensive training. M=0 indicates successful convergence; M=1 indicates a training failure mode. Intensive training directly improves Y (e.g., accuracy) but also raises the risk of the failure mode. Failure (M=1) then degrades Y. The archive contains only successfully converged models (M=0). The CDE captures the benefit of R=1 while artificially preventing any new failures. In a real switch, some currently stable models would develop the failure mode under R=1, potentially lowering their Y. The project lead mistakenly assumes that because these models currently have M=0, they would remain M=0 under the new regime\u2014contradicting the causal link R \u2192 M. The relevant quantity is the total effect (or the effect for this subgroup allowing M to change), not the CDE.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes natural regime switch in selected subgroup from intervention fixing mediator.",
+      "secondary_caveats": []
+    }
+  ]
+}

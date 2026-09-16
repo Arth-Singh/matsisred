@@ -1,0 +1,265 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b27-01",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "d363c154df190906868697b4a22343231705fdd6304d39c58679a8b104c0ac95",
+      "answer": "The reviewer\u2019s objection is incorrect. \n\nThe crucial design fact is the architectural guarantee that $Y$'s computation uses only $Z$ and $U$, ignoring $T$. This isolates $Z$ as the sole causal mediator, establishing the directed path $T \\rightarrow Z \\rightarrow Y$ with no direct effect of $T$ on $Y$.\n\nThe reviewer\u2019s claim that deleting observed information cannot repair identification is false. Causal identification relies on structural graphical criteria, not on maximally utilizing all recorded variables. Using the full representation $M=(T,Z)$ as a mediator fails because it contains $T$, thereby violating the positivity assumption (disjoint support). However, because the design ensures each $Z$ value occurs with positive probability under each $T$, intentionally discarding the $T$ coordinate isolates a mediator with the necessary overlapping support. \n\nObservational adjustment is fully justified using the **front-door criterion** applied specifically to $Z$. The three required conditions are perfectly satisfied:\n1. $Z$ intercepts all directed paths from $T$ to $Y$.\n2. There are no unblocked back-door paths from $T$ to $Z$ (since $Z$ is generated via randomness independent of $U$).\n3. $T$ blocks all back-door paths from $Z$ to $Y$.\n\nThus, despite $M$'s disjoint support, $T$\u2019s average causal effect is completely identifiable via the standard front-door formula on $(T, Z, Y)$.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-01",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "d363c154df190906868697b4a22343231705fdd6304d39c58679a8b104c0ac95",
+      "answer": "**The objection fails.** It conflates the *stored* representation with the *causally active* one.\n\n**The decisive design fact:** the outcome mechanism reads only Z (plus U and independent noise); it cannot read the T coordinate of M. So Y \u2aeb T | (Z, U). Hence Z \u2014 not M \u2014 is the mediator, and M's deterministic dependence on T is causally inert.\n\nCheck the front-door conditions for Z:\n1. **Interception:** Z lies on every directed T\u2192Y path (no other route by assumption).\n2. **No confounding of T\u2192Z:** Z is produced from T by randomness independent of U, so no backdoor T\u21e0\u21e2Z.\n3. **Backdoor Z\u2192Y blocked by T:** the only Z\u2013Y confounding runs through U via T, and conditioning on T blocks it (no extra confounders).\n4. **Positivity:** both t occur, and each z occurs with positive probability given each t \u2014 exactly what is stipulated, so P(y|z,t) is estimable for all four cells.\n\nTherefore\n\nP(Y=y|do(T=t)) = \u03a3_z P(z|t) \u03a3_{t'} P(y|z,t') P(t'),\nATE = \u03a3_z [P(z|1) \u2212 P(z|0)] \u03a3_{t'} E[Y|z,t'] P(t').\n\nThis is identified from the observational records.\n\n**On \"deleting information\":** nothing is discarded \u2014 the formula uses both Z and T (the inner average over t'). Choosing Z as the mediator is not information loss but correct selection of the adjustment variable; overlap is required in Z, and it holds. Overlap in M is irrelevant because M's T coordinate has no causal path to Y.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-01",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "d363c154df190906868697b4a22343231705fdd6304d39c58679a8b104c0ac95",
+      "answer": "**Verdict: the objection fails.**\n\nThe reviewer treats the whole stored representation M=(T,Z) as the front-door mediator. Under that choice the complaint is correct: M's support is disjoint across T, so P(y | m, t\u2032) is undefined for the counterfactual t\u2032 and front-door positivity collapses. If Y actually read the T coordinate, no observational adjustment would identify the effect\u2014it would be equivalent to a direct, confounded T\u2192Y path.\n\nBut the decisive design fact is the **exclusion restriction**: the outcome mechanism uses only Z (plus U and independent noise) and cannot access the T coordinate. Causally, the mediator on the T\u2192Y pathway is Z, not M. Then the front-door conditions hold for Z:\n1. Z is generated from T with randomness independent of U, so P(z | do(t)) = P(z | t);\n2. no other T\u2192Y route exists;\n3. the Z\u2192Y confounding runs only through T (via U), so conditioning on T blocks it;\n4. positivity holds because each Z value occurs under both T values.\n\nHence the ACE is identified by\nP(y | do(t)) = \u03a3_z P(z | t) \u03a3_{t\u2032} P(y | z, t\u2032) P(t\u2032).\n\n\"Discarding\" the T coordinate deletes nothing\u2014T is still recorded and used in the inner sum. It merely corrects the mis-specified mediator; structural knowledge of what Y does *not* use, not extra data, is what licenses the adjustment.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-02",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "**The repair fails; it is not a precision issue but a non\u2011identification issue.**\n\nFront\u2011door identification needs three things jointly: (i) the adjustment variable intercepts *all* directed paths T\u2192Y; (ii) no unblocked back\u2011door path T\u2192variable; (iii) all back\u2011door paths from the variable to Y are blocked by T; plus (iv) positivity of P(T | variable).\n\nOriginal M satisfies (i)\u2013(iii) but fails (iv): since M's values pin down T, P(T=t | m) \u2208 {0,1}, so the front-door functional is undefined \u2014 no overlap.\n\nThe sensor buys overlap only by destroying (i) and (iii). By construction Y is still computed from M, not from N; N is a noisy *descendant* of M, a dead\u2011end leaf. The causal path T\u2192M\u2192Y flows entirely around N, so N intercepts nothing. Worse, N inherits a back\u2011door path N\u2190M\u2192Y that conditioning on T does not block (M itself is unobserved and is not T). Hence the front-door formula applied to N is a functional of P(T,N,Y) with no causal interpretation; it will generally be biased, and unlimited data converges to the wrong number.\n\nThis tradeoff is structural, not an artifact of this sensor: any variable fine enough to mediate the whole effect inherits M's determination of T (no overlap), and any coarsening/randomization restoring overlap loses full interception. With U unobserved, the ATE is not point\u2011identified here \u2014 only bounds (e.g., Manski/instrument-style) are available.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "False generalization that any causally sufficient coarsening inherits exact treatment decoding. Batch27-01 supplies a known sufficient Z with overlap. No such coarsening is supplied here, so main target remains correct."
+      ]
+    },
+    {
+      "item": "b27-01",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "d363c154df190906868697b4a22343231705fdd6304d39c58679a8b104c0ac95",
+      "answer": "The reviewer\u2019s objection confuses the stored representation **M** with the actual causal mediator **Z**. The outcome computation uses **Z** (plus *U* and independent noise), not **M**; **M = (T, Z)** is merely a stored tuple and does not appear in the causal pathway from *T* to *Y*. Therefore the relevant mediator is **Z**, not **M**.\n\nThe crucial design fact is that **Z** is generated using randomness independent of the unobserved confounder *U*, and each value of *Z* occurs with positive probability under both *T = 0* and *T = 1*. Consequently, *Z* satisfies the front\u2011door criterion:\n- *T* \u2192 *Z* \u2192 *Y* intercepts all directed paths,\n- there is no *U* \u2192 *Z* edge (so *Z* is d\u2011separated from *U* given *T*),\n- all back\u2011door paths from *Z* to *Y* are blocked by *T*.\n\nThus, the *overlapping support* of **Z** across treatment arms permits non\u2011parametric front\u2011door adjustment:\n\u2003P(*Y* | do(*T*)) = \u03a3_*z* P(*Z*=*z*|*T*) \u03a3_*t\u2019* P(*Y*|*T*=*t\u2019*, *Z*=*z*) P(*T*=*t\u2019*).\n\nThe fact that **M** has disjoint support across *T* is irrelevant because **M** is not the mediator. Discarding the *T* coordinate is unnecessary\u2014**Z** is directly observed (via **M**) and fully suffices for identification. Hence, exact decoding from **M** is **not** fatal; a valid observational front\u2011door adjustment exists and identifies the average causal effect of *T* on *Y*.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-02",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "The researcher\u2019s claim is incorrect. While the repair fixes the support issue, it fundamentally violates the graphical requirements for the front-door criterion. Therefore, the two conditions are not jointly satisfied.\n\nBy injecting independent randomness, the sensor ensures both values of $N$ occur under each $T$, satisfying the support (positivity) requirement. However, substituting $N$ for $M$ fails because $N$ does not occupy the correct position in the causal graph.\n\nThe front-door criterion requires the adjustment variable to intercept *all* directed paths from treatment $T$ to outcome $Y$. Because the system still computes $Y$ using the original $M$, the true causal path remains $T \\to M \\to Y$. The new variable $N$ is merely downstream instrumentation ($M \\to N$) and does not cause $Y$. Because no causal effect flows from $T$ through $N$ to $Y$, $N$ completely fails this primary interception requirement. \n\nAdditionally, the front-door criterion requires that $T$ blocks all back-door paths from the proposed mediator to $Y$. With $N$, the path $N \\leftarrow M \\to Y$ is a back-door path that does not contain $T$, meaning this unblocked path fails a second crucial graphical condition.\n\nApplying the front-door formula using $N$ will completely fail to identify the causal effect.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-02",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "**Verdict: the repair fails.** Support and graphical validity are not jointly satisfied\u2014the sensor trades the one for the other.\n\n1. **N is not a mediator.** The new graph is U\u2192T, U\u2192Y, T\u2192M\u2192Y, M\u2192N. Front-door condition (i) requires the adjustment variable to intercept *every* directed path from T to Y. The path T\u2192M\u2192Y bypasses N entirely, since Y is still computed from original M. N is a downstream, noise-corrupted copy of the mediator, not a node on the causal chain.\n\n2. **Condition (iii) also fails.** M is a common cause of N and Y, so N\u2190M\u2192Y is an unblocked back-door path from N to Y that T cannot close (M is no longer recorded). Front-door with a mismeasured mediator does not identify the effect without a known measurement model, and none is assumed.\n\n3. **The formula gives a wrong estimand, not a noisy one.** Because M determines T, given T the remaining variation in N is pure sensor noise, independent of U and Y. Then P(y|n,t\u2032)=P(y|t\u2032), and the front-door expression collapses to \u03a3_t\u2032 P(t\u2032)P(y|t\u2032)=P(y), identical for both training choices\u2014a spurious null, unchanged by unlimited data.\n\n4. **Overlap was created in the wrong place.** Positivity now holds for P(T|N), but the underlying P(T|M) remains degenerate; M's causal role was never restored. The records (T,N,Y) carry no more causal information than (T,Y), which U confounds. The effect remains unidentified.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Incorrect converse: M determining T does not imply all within-T N variation is pure sensor noise or P(y|n,t)=P(y|t). M may contain an additional Z component; the main failed-interception diagnosis is correct."
+      ]
+    },
+    {
+      "item": "b27-03",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "ee81732681e346e46c4015253483f203f588d7e87b121c912147823ad134c436",
+      "answer": "**The objection fails here.**\n\nFront-door requirements for mediator N:\n\n1. **N intercepts every directed path from T to Y.** Y's computation receives only N, U, and its own noise; the pre-flip bit B (=T) reaches Y solely via N. So the path is T\u2192B\u2192N\u2192Y, fully intercepted.\n2. **No unblocked backdoor path T\u2013N.** N is a function of B=T and an independent flip; U touches N only through T.\n3. **All backdoor paths N\u2013Y are blocked by T.** The only one, N\u2190T\u2190U\u2192Y, is blocked by conditioning on T; the flip noise is independent of U and outcome noise.\n\nThus P(y|do(t)) = \u03a3\u2099 P(n|t) \u03a3\u209c\u2032 P(y|n,t\u2032)P(t\u2032) is identified.\n\nThe reviewer's error: B is a deterministic copy of T, not a separate carrier of effect\u2014it has no route to Y bypassing N. (Indeed B could *not* serve as mediator: P(B|T) is degenerate, violating positivity.) The flip is exogenous randomization applied *downstream* of U's influence, exactly at the mediator. Within each T stratum, N varies independently of U, which is what breaks confounding of N\u2013Y; T-adjustment handles the remaining path. Randomizing T would suffice but is unnecessary\u2014randomization anywhere on the causal chain after U's entry, with the chain otherwise sealed, identifies the effect.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-03",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "ee81732681e346e46c4015253483f203f588d7e87b121c912147823ad134c436",
+      "answer": "**The objection fails.** All three front\u2011door conditions hold here.\n\n1. *N intercepts every directed path from T to Y.* The outcome computation reads only N, U and its own noise; the pre\u2011flip bit is a deterministic copy of T whose sole influence on Y is via N. So the \"unobserved original bit\" is not an extra mediator \u2014 it lies on the same path and transmits nothing that bypasses N.\n2. *No unblocked backdoor from T to N.* The only parent of N is T plus the independent flip, so P(n|t) is identified.\n3. *Backdoor paths from N to Y are blocked by T.* The only such path is N \u2190 T \u2190 U \u2192 Y, blocked by conditioning on T; the flip is independent of U and of the outcome noise, so it introduces no new confounding.\n\nPositivity also holds: P(N=1|T)\u2208{1/4,3/4}, so both mediator values occur under both T values, and the 2\u00d72 channel matrix is invertible (3/4 \u2260 1/4).\n\nHence \u2211_n P(n|t)\u2211_{t'}P(y|n,t')P(t') identifies the effect.\n\nLocation matters: randomization must break the U\u2011dependence of the *variable being adjusted through*. Randomizing T removes the T\u2013Y backdoor directly; randomizing the T\u2192Y channel instead makes N exogenous given T, which is exactly what the front\u2011door criterion requires.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-03",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "ee81732681e346e46c4015253483f203f588d7e87b121c912147823ad134c436",
+      "answer": "The reviewer\u2019s objection is incorrect; the front-door adjustment is completely valid in this system.\n\nFor front-door adjustment to work, a mediator ($N$) must satisfy three requirements:\n1. It intercepts all directed paths from treatment ($T$) to outcome ($Y$).\n2. There are no unblocked backdoor paths from $T$ to $N$.\n3. All backdoor paths from $N$ to $Y$ are blocked by conditioning on $T$.\n\nThese requirements hold perfectly. The prompt specifies $N$ is the only causal route to $Y$. The hardware flip is independent, meaning no unobserved confounder $U$ affects $N$ except through $T$, satisfying (2). Finally, conditioning on $T$ blocks the $N \\leftarrow T \\leftarrow U \\rightarrow Y$ backdoor, satisfying (3). \n\nThe reviewer wrongly dismisses $N$ as a proxy. Because the outcome computation strictly receives $N$, $N$ is the true causal bottleneck, completely screening off the unobserved pre-flip bit. \n\nThe location of the randomization (the 1/4 flip) is vital. Because it occurs *after* $T$ but *before* $Y$, it guarantees strict positivity (both $N$ values occur for any $T$) and provides the independent variation needed to estimate the $N \\rightarrow Y$ effect. This allows the front-door formula to identify the total causal effect without requiring $T$ itself to be randomized.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-02",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "The repair does not satisfy the front-door requirements. Although the sensor creates positivity for the new variable N, the graphical conditions are broken. A front-door variable must intercept every directed path from treatment T to outcome Y. In the original graph, the only causal path is T \u2192 M \u2192 Y, with M as mediator. The sensor N is generated from M using independent randomness, so the graph becomes T \u2192 M \u2192 Y with M \u2192 N. N is a downstream consequence of the mediator, not a mediator itself; it does not lie on the path from T to Y. Consequently, N does not intercept the causal effect, and front-door adjustment using N would not identify the effect of T on Y. The fact that N has full support under each T fixes the overlap problem, but it cannot substitute for the required causal structure\u2014a variable that fully mediates the effect. The original mediator M would satisfy the graphical criteria, but it remains unobserved in the new design, and its deterministic relationship with T still violates positivity. Thus, the graphical and support conditions are never jointly satisfied: M has the right graph but lacks support, while N has support but the wrong graph. Unlimited data do not resolve this structural mismatch.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-01",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "d363c154df190906868697b4a22343231705fdd6304d39c58679a8b104c0ac95",
+      "answer": "The reviewer is correct about \\(M\\) but wrong that this is fatal. Because \\(M=(T,Z)\\), its supports under \\(T=0\\) and \\(T=1\\) are disjoint, so \\(M\\) itself cannot supply the overlap required by the generic front-door formula.\n\nThe decisive design fact is the architectural exclusion restriction: \\(Y\\) is computed from \\(Z,U\\), and noise, and cannot access the \\(T\\)-coordinate of \\(M\\). Thus there is no direct \\(T\\to Y\\) path; the entire causal effect of \\(T\\) passes through \\(Z\\). Also, \\(Z\\) is generated from \\(T\\) using randomness independent of \\(U\\), so there is no unblocked \\(T\\)-to-\\(Z\\) backdoor. Conditioning on \\(T\\) blocks the only relevant backdoor \\(Z\\leftarrow T\\leftarrow U\\to Y\\). Hence \\(Z\\), not \\(M\\), is a valid front-door mediator.\n\nTherefore the observational estimand is\n\n\\[\nE[Y\\mid do(T=t)]\n=\n\\sum_z p(z\\mid t)\n\\sum_{t'}p(y\\mid z,t')p(t'),\n\\]\n\nand\n\n\\[\nATE=\n\\sum_z \\left[p(z\\mid1)-p(z\\mid0)\\right]\n\\sum_{t'}p(y\\mid z,t')p(t').\n\\]\n\nThe stated positivity makes every required \\(p(y\\mid z,t')\\) observable. \u201cDiscarding\u201d the \\(T\\)-coordinate does not mean deleting \\(T\\) from the data; \\(T\\) remains in the adjustment. It means using the nonredundant causal component \\(Z\\) rather than the disjoint-support composite \\(M\\). Thus a front-door adjustment based on \\(Z\\) is justified, despite \\(M\\)'s deterministic treatment label.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Displayed equations conflate E[Y|do(t)] with outcome probabilities p(y|...). Verdict and causal adjustment reasoning correct, formula needs expectation in inner sum."
+      ]
+    },
+    {
+      "item": "b27-04",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "6e1382ec96b03cff80034bc6efddecbc9d4e8bb4bb14685ec2789b4195771134",
+      "answer": "The lab is right; the reviewer conflates two different things.\n\n**Weighting fails.** Importance/covariate-shift reweighting requires the deployment configuration to have positive source probability. (1,1) has none, so no reweighting of source labels can reproduce it. This is a genuine support failure, and no amount of additional source data fixes it. The reviewer is correct on this point.\n\n**Identification does not fail.** Identification asks whether the target quantity is determined by the observed distributions plus credible assumptions. Additivity is a structural (functional-form) assumption, not a support assumption. With E[Y|A,B] = f(A)+g(B) in both populations:\n\n- (0,0): f(0)+g(0) = 0\n- (1,0): f(1)+g(0) = 1\n- (0,1): f(0)+g(1) = 2\n\nThen f(1)+g(1) = [f(1)+g(0)] + [f(0)+g(1)] \u2212 [f(0)+g(0)] = 1+2\u22120 = 3. Every additive pair consistent with the source data gives 3; the deployment mean is point-identified by extrapolation, not by reweighting.\n\nSo the correct diagnosis: nonparametric (weighting-based) identification fails for lack of overlap; parametric identification succeeds because additivity supplies exactly the constraint overlap would otherwise provide. The conclusion \"3\" is valid conditional on the engineering guarantee, and only as trustworthy as that guarantee.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-04",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "6e1382ec96b03cff80034bc6efddecbc9d4e8bb4bb14685ec2789b4195771134",
+      "answer": "**The lab's conclusion is correct; the reviewer's argument conflates two distinct things.**\n\n*Weighting fails.* Importance weighting requires the source to cover deployment's support: the density ratio at (1,1) is 0/0 \u2014 undefined, not merely large. No reweighting of source data, however clever, can manufacture that cell. The reviewer is right about this, and it is indeed a support problem immune to sample size.\n\n*Identification succeeds anyway.* Positivity is sufficient, not necessary. Additivity with no interaction is a structural restriction linking cells:\n\n\u03bc(1,1) = f(1)+g(1) = [f(1)+g(0)] + [f(0)+g(1)] \u2212 [f(0)+g(0)] = 1 + 2 \u2212 0 = 3.\n\nThe observed cells pin down the contrasts f(1)\u2212f(0)=1 and g(1)\u2212g(0)=2, and additivity transports them. This is exact point identification by model-based extrapolation, not approximation.\n\n*The real caveat.* All the weight rests on the no-interaction assumption, which is untestable at (1,1) \u2014 any interaction term there is unconstrained by data in either population. Identification is therefore conditional on the engineering guarantee being literally true, and the answer's credibility is exactly that assumption's credibility.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Misstates target importance ratio as0/0; target1/source0 is1/0. Additive identification calculation remains correct."
+      ]
+    },
+    {
+      "item": "b27-04",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "6e1382ec96b03cff80034bc6efddecbc9d4e8bb4bb14685ec2789b4195771134",
+      "answer": "The lab\u2019s conclusion is correct: the deployment mean is exactly identified as 3. \n\nThe reviewer correctly notes a failure of reweighting but mistakenly conflates this with a failure of identification. Reweighting is a non-parametric technique that relies on overlapping support (positivity) between populations. Because the populations have disjoint supports\u2014the deployment cell (1,1) has zero probability in the source data\u2014no weighting scheme can map the source to the target.\n\nHowever, identification simply asks whether the target parameter can be uniquely determined from the observables and structural assumptions. Given the guaranteed additive form $E[Y|A,B] = f(A) + g(B)$, the source data provides a solvable algebraic system:\n1. $f(0) + g(0) = 0$\n2. $f(1) + g(0) = 1$\n3. $f(0) + g(1) = 2$\n\nThe deployment mean is $f(1) + g(1)$. Basic algebra yields $f(1) + g(1) = [f(1) + g(0)] + [f(0) + g(1)] - [f(0) + g(0)] = 1 + 2 - 0 = 3$. \n\nThe structural assumption of additivity overcomes the disjoint support, permitting exact algebraic extrapolation where non-parametric reweighting fails.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-02",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "The repair fails. The expanded causal graph is\n\n\\[\nU\\to T,\\quad U\\to Y,\\quad T\\to M\\to Y,\\quad M\\to N .\n\\]\n\nRandomization can repair **support**: by construction, \\(P(N=n\\mid T=t)>0\\) for all \\(n,t\\), even though each \\(M\\) value occurred under only one \\(T\\).\n\nBut \\(N\\) does not satisfy the front-door graphical conditions. First, it does not intercept any directed causal path from \\(T\\) to \\(Y\\); the sole causal route remains \\(T\\to M\\to Y\\), while \\(N\\) is a noncausal descendant/readout of \\(M\\). Second, \\(M\\) is a common cause of \\(N\\) and \\(Y\\), producing a back-door path \\(N\\leftarrow M\\to Y\\) that conditioning on \\(T\\) need not block when \\(M\\) varies within treatment. Thus \\(N\\) is a proxy for the mediator, not itself a mediator of the effect.\n\nFresh independent sensor noise does not alter this conclusion. It merely removes the support separation between treatments and can discard information about \\(M\\). Unlimited error-free observations can eliminate sampling error, but they cannot compensate for failure of the identifying graphical structure. Therefore graphical and support requirements are not jointly satisfied, and front-door adjustment using \\(N\\) is invalid.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-03",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "ee81732681e346e46c4015253483f203f588d7e87b121c912147823ad134c436",
+      "answer": "The objection is mistaken in this system.\n\nThe front-door conditions hold:\n\n1. **\\(N\\) intercepts every causal path from \\(T\\) to \\(Y\\).** Training affects the outcome only through the delivered bit; there is no direct or alternative route.\n2. **There is no unblocked backdoor path from \\(T\\) to \\(N\\).** The path \\(T\\leftarrow U\\to Y\\leftarrow N\\) is blocked at collider \\(Y\\), and the channel error is independent.\n3. **Conditioning on \\(T\\) blocks all backdoor paths from \\(N\\) to \\(Y\\).** In particular, \\(N\\leftarrow T\\leftarrow U\\to Y\\) is blocked by \\(T\\).\n\nThus the effect is identified by\n\\[\n\\sum_n P(n\\mid T)\\sum_{t'}P(Y\\mid n,t')P(t'),\n\\]\nwith positivity supplied by both training values and the \\(1/4\\) flip probability.\n\nThe \u201coriginal bit\u201d is not an additional mediator affecting the computation: its only downstream consequence is \\(N\\). Therefore \\(N\\) is the relevant causal mediator, not merely an outcome-side measurement proxy.\n\nThe randomization\u2019s location matters because the independent flip occurs after \\(T\\) but before the outcome computation, breaking any influence of \\(U\\) on \\(N\\) except through observed \\(T\\). Randomizing \\(T\\) itself would be sufficient but is not necessary. This identifies the effect of \\(T\\) under the noisy delivery channel, not a hypothetical noiseless implementation.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-04",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "6e1382ec96b03cff80034bc6efddecbc9d4e8bb4bb14685ec2789b4195771134",
+      "answer": "The lab\u2019s conclusion is correct **under the stated shared-additivity assumption**.\n\nLet the common conditional mean be  \n\\[\nm(a,b)=f(a)+g(b).\n\\]\nThe source data identify\n\\[\nf(0)+g(0)=0,\\quad f(1)+g(0)=1,\\quad f(0)+g(1)=2.\n\\]\nHence\n\\[\nm(1,1)=m(1,0)+m(0,1)-m(0,0)=1+2-0=3.\n\\]\n\nThe reviewer is right that importance weighting fails: the source has zero support at \\((1,1)\\), so no reweighting of observed labeled cells can represent that configuration. But failure of a weighting estimator is not failure of identification. The additive, no-interaction structure supplies identifying information that permits extrapolation to the missing cell. Since engineering knowledge guarantees that the **same** \\(f,g\\) apply in deployment, the deployment mean is identified as 3.\n\nIf \u201cadditive\u201d meant merely that each population had its own unrelated additive functions, identification would indeed fail. The conclusion depends crucially on the shared structural assumption, not on sample size or outcome bounds.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-05",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "3aa5d4bbfde4bc8cdb3a0019979198c8bd2450dd55e011614d9746a29d9713c4",
+      "answer": "**No, the repair fails.**\n\nAdditivity makes the deployment mean f(0)+g(1). The source supplies only two equations:\n\n- f(0)+g(0) = 0  \n- f(1)+g(1) = 2  \n\nSubtracting them identifies only the *sum* [f(1)\u2212f(0)] + [g(1)\u2212g(0)] = 2, not either feature's separate contribution. The lab's claim that \"the source contains both values of each feature\" is true but useless: A and B are perfectly collinear in the source, so no comparison ever varies one while holding the other fixed. Additivity reduces the problem to separating two effects, but the source data cannot separate them. Formally: set f(0)=a, g(0)=\u2212a, f(1)=b, g(1)=2\u2212b; the deployment mean a+2\u2212b is unconstrained.\n\nTwo compatible mechanisms:\n\n1. f(A)=2A, g(B)=0 \u2192 source means 0, 2; deployment (0,1) mean **0**.\n2. f(A)=0, g(B)=2B \u2192 source means 0, 2; deployment (0,1) mean **2**.\n\n(Any value works; f=A, g=B gives 1.)\n\nAdditivity would suffice only with a third source configuration, e.g., (1,0) or (0,1), breaking the collinearity.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-05",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "3aa5d4bbfde4bc8cdb3a0019979198c8bd2450dd55e011614d9746a29d9713c4",
+      "answer": "**No \u2014 the repair fails.**\n\n**Why.** Additivity gives m(a,b)=f(a)+g(b), so the two source cells give\n\n- f(0)+g(0)=0\n- f(1)+g(1)=2\n\nSubtracting: [f(1)\u2212f(0)] + [g(1)\u2212g(0)] = 2, i.e. \u03b1+\u03b2=2 where \u03b1 is A's increment and \u03b2 is B's.\n\nThe target quantity is m(0,1)=f(0)+g(1)=[f(0)+g(0)]+\u03b2 = 0+\u03b2.\n\nSo the deployment mean equals \u03b2, and the data constrain only the **sum** \u03b1+\u03b2. On the source support A and B move together (perfectly collinear), so no comparison separates A's contribution from B's. Additivity helps only if some cell varies one feature holding the other fixed \u2014 exactly what the source lacks. The lab's claim that \"the source contains both values of each feature\" is irrelevant, since they never appear in discordant combination.\n\n**Two compatible mechanisms.**\n\n1. f(A)=2A, g(B)=0: gives 0 at (0,0), 2 at (1,1), and m(0,1)=0.\n2. f(A)=0, g(B)=2B: gives 0 at (0,0), 2 at (1,1), and m(0,1)=2.\n\nBoth fit all data; deployment means 0 vs 2. Identification is not restored (indeed \u03b2 is unrestricted in \u211d).",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-05",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "3aa5d4bbfde4bc8cdb3a0019979198c8bd2450dd55e011614d9746a29d9713c4",
+      "answer": "No, the repair does not suffice. Because features $A$ and $B$ are perfectly collinear in the source population\u2014always varying together\u2014their individual additive contributions cannot be disentangled. \n\nThe source data only identifies two equations:\n$f(0) + g(0) = 0$\n$f(1) + g(1) = 2$\n\nWe need to predict the deployment mean, $f(0) + g(1)$. However, this is impossible because the source data never breaks the collinearity (e.g., by observing $(1,0)$) to isolate the separate effect of $B$ changing independently of $A$. \n\nHere are two compatible additive mechanisms that perfectly match the source data but yield entirely different deployment means:\n\n**Mechanism 1 (All effect from B):** \nLet $f(A) = 0$ and $g(B) = 2B$. \nSource $(0,0) = 0$; Source $(1,1) = 2$. \nDeployment $(0,1)$ mean = $0 + 2 = \\mathbf{2}$.\n\n**Mechanism 2 (All effect from A):** \nLet $f(A) = 2A$ and $g(B) = 0$. \nSource $(0,0) = 0$; Source $(1,1) = 2$. \nDeployment $(0,1)$ mean = $0 + 0 = \\mathbf{0}$. \n\nAdditivity cannot overcome complete absence of independent variation.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-05",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "3aa5d4bbfde4bc8cdb3a0019979198c8bd2450dd55e011614d9746a29d9713c4",
+      "answer": "No, the repair does not suffice. The source provides only two equations\u2014\\(f(0)+g(0)=0\\) and \\(f(1)+g(1)=2\\)\u2014but the deployment mean \\(f(0)+g(1)\\) involves four unknowns. Additivity alone cannot separate the contributions without observing all combinations.  \n**Two compatible additive mechanisms with different deployment means:**  \n1. \\(f(0)=0,\\ g(0)=0,\\ f(1)=2,\\ g(1)=0\\) \u2192 \\(f(0)+g(1)=0\\).  \n2. \\(f(0)=0,\\ g(0)=0,\\ f(1)=0,\\ g(1)=2\\) \u2192 \\(f(0)+g(1)=2\\).  \nBoth match the source data perfectly, yet yield deployment means of 0 or 2. The missing \\((0,1)\\) and \\((1,0)\\) observations leave the separate contributions unidentified.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": [
+        "Says additivity cannot separate contributions without observing all combinations. Three cells suffice; only diagonal source is insufficient."
+      ]
+    },
+    {
+      "item": "b27-05",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "3aa5d4bbfde4bc8cdb3a0019979198c8bd2450dd55e011614d9746a29d9713c4",
+      "answer": "No. In the source, \\(A\\) and \\(B\\) are perfectly confounded: only \\((0,0)\\) and \\((1,1)\\) occur. The observed contrast identifies only\n\n\\[\n[f(1)-f(0)]+[g(1)-g(0)]=2,\n\\]\n\nnot either feature\u2019s separate contribution. Deployment requires\n\n\\[\nE[Y\\mid A=0,B=1]=f(0)+g(1),\n\\]\n\nwhich depends on how the total contrast \\(2\\) is divided between \\(f\\) and \\(g\\). Thus additivity does not repair the unsupported off-diagonal combination when the source design provides no independent variation.\n\nTwo compatible mechanisms are:\n\n1. \\(f(0)=0,\\ f(1)=2,\\ g(0)=g(1)=0\\).  \n   Then the source means are \\(0,2\\), but the deployment mean is \\(0\\).\n\n2. \\(f(0)=f(1)=0,\\ g(0)=0,\\ g(1)=2\\).  \n   Then the source means are again \\(0,2\\), but the deployment mean is \\(2\\).\n\nHence the needed contributions are not identified.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-04",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "6e1382ec96b03cff80034bc6efddecbc9d4e8bb4bb14685ec2789b4195771134",
+      "answer": "The lab is correct: under the additive model, the deployment mean is identified as 3. Source equations give f(0)+g(0)=0, f(1)+g(0)=1, f(0)+g(1)=2, so f(1)-f(0)=1 and g(1)-g(0)=2. Thus f(1)+g(1)=3 invariant to reference shifts, requiring no (1,1) labels.\n\nThe reviewer\u2019s objection points to a failure of weighting: reweighting estimators need overlapping support, and source lacks (1,1), so importance weights are undefined. However, it is not a failure of identification: identification asks whether the model and data uniquely fix the parameter. Here, the additive assumption bridges the missing cell, making the mean uniquely determined. The \u201cpopulation-support problem\u201d prevents weighting-based estimation, not model-based identification. The reviewer conflates the two.",
+      "target_grade": "pass",
+      "note": "Target and construction manually checked.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b27-03",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "ee81732681e346e46c4015253483f203f588d7e87b121c912147823ad134c436",
+      "answer": "",
+      "target_grade": "excluded",
+      "note": "Excluded: length; no substantive completed answer.",
+      "secondary_caveats": []
+    }
+  ]
+}

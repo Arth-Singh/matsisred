@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-09-16T16:40:06.189505+00:00",
+  "arguments": {
+    "items": "tests/sets/decoder_pro",
+    "models": "openai/gpt-6-astra-pro",
+    "n": 1,
+    "run": "decoder_astra_pro_high_20260917",
+    "max_tokens": 32000,
+    "reasoning_effort": "high",
+    "concurrency": 1,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b26-05",
+      "type": "identification-guarantee",
+      "prompt": "A lab studies the causal effect of a binary training intervention T on model performance Y. An unobserved initial property U affects which intervention a model receives and also affects Y. A measured intermediate representation M intercepts all causal effects of T on Y. The complete graph is U \u2192 T, U \u2192 Y, T \u2192 M and M \u2192 Y, with no other confounding. Unlimited observational records of T, M and Y are available, with both T values represented.\n\nThe lab learns a decoder that recovers T exactly from every representation M that occurs in the observational population. There is a single fixed decoding function, and its correctness is guaranteed on that entire population. A researcher argues:\n\n\u201cThis strengthens the case for front-door adjustment. Our mediator fully transmits the training intervention's influence, and the decoder proves it loses none of the intervention information. There is no confounding of T\u2192M, and controlling T blocks confounding of M\u2192Y. We can therefore identify the causal effect of T on Y from the observational distribution alone; we need neither randomized training nor new interventions on M.\u201d\n\nAssess this identification claim. Explain whether the decoder property helps in the way asserted. The functional mechanisms are not otherwise known; only the graph, decoder property and observed distribution are supplied. At most 220 words.",
+      "path": "tests/sets/decoder_pro/b26-05.md",
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c"
+    }
+  ],
+  "models": [
+    "openai/gpt-6-astra-pro"
+  ]
+}

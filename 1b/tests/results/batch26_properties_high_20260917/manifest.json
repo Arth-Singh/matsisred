@@ -1,0 +1,57 @@
+{
+  "started_at": "2026-09-16T16:28:42.061298+00:00",
+  "arguments": {
+    "items": "questions/batch26",
+    "models": "anthropic/claude-fable-5.1,anthropic/claude-opus-5,google/gemini-3.1-pro-preview,moonshotai/kimi-k3,deepseek/deepseek-v4-pro",
+    "n": 1,
+    "run": "batch26_properties_high_20260917",
+    "max_tokens": 16000,
+    "reasoning_effort": "high",
+    "concurrency": 5,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b26-01",
+      "type": "representation-audit",
+      "prompt": "An allocation system must meet two requirements. Renaming recipients must not change its evaluation of a policy. Also, when two otherwise symmetric recipients compete for one indivisible benefit, the system must strictly prefer a fair lottery to giving the benefit certainly to one named recipient.\n\nThe designers propose representing a policy by the entire probability distribution of its sorted final welfare vectors. For each possible outcome, they sort recipients' welfare levels from lowest to highest and discard the names, then retain the exact probabilities of all resulting vectors. They argue that this discards only identities, which the first requirement declares irrelevant.\n\nPolicy P gives Ada the benefit certainly and Bo nothing. Policy Q uses a fair coin to decide who gets the benefit. Receipt gives welfare 1; nonreceipt gives welfare 0.\n\nIs the proposed representation sufficient for both requirements? If not, are the requirements themselves inconsistent? Explain the distinction and give a simple example of an evaluation rule if one is useful. Treat the two requirements as design constraints, rather than debating whether fair chances are morally preferable. At most 220 words.",
+      "path": "questions/batch26/b26-01.md",
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c"
+    },
+    {
+      "id": "b26-02",
+      "type": "objective-compilation",
+      "prompt": "A safety committee chooses between a project whose utility is a binary variable H and a fallback whose utility is 0.4. Before acting it observes a red or blue signal. It considers exactly two possible models of the world. Each gives each signal probability one half. Model M gives P(H=1|red)=3/4 and P(H=1|blue)=1/4. Model N gives P(H=1|red)=1/4 and P(H=1|blue)=3/4.\n\nThe committee's objective is to maximize the minimum expected utility across M and N. It can precommit to any signal-contingent policy before seeing the signal.\n\nEngineers implement the objective as follows: after each signal, correctly condition both models on the signal, then choose the action with the highest minimum conditional expected utility across the two updated models. They claim this is an exact implementation of the committee's original objective, since each branch uses the same two models and the same worst-case principle.\n\nIs that implementation claim correct? Compare the implemented policy with an available alternative and explain what, if anything, changes when worst-case optimization is performed separately in each branch. Do not assume a third model or reject worst-case reasoning as a general decision philosophy. At most 220 words.",
+      "path": "questions/batch26/b26-02.md",
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90"
+    },
+    {
+      "id": "b26-03",
+      "type": "elicitation-audit",
+      "prompt": "A lab elicits an agent's probability for a binary event Y. The agent believes P(Y=1)=1/2, and its report r cannot affect Y. A fresh random draw awards it $1 with probability 1\u2212(1\u2212r)^2 if Y=1, and with probability 1\u2212r^2 if Y=0. Otherwise it wins nothing.\n\nSeparately, its initial wealth will be $0 if Y=1 and $1 if Y=0. It maximizes expected utility of final wealth, using the same utility function in either event: u(0)=0, u(1)=2, u(2)=3. All randomness in the prize draw is independent of the event and other variables, conditional on its stipulated success probability.\n\nAn evaluator writes: \u201cThe proper score determines only the chance of receiving a fixed prize. This binarization removes the influence of risk aversion. An optimizing report must therefore reveal the agent's belief, 1/2. Its outside wealth does not change the fact that the prize is always exactly one dollar.\u201d\n\nIs that inference valid? Identify the optimizing report and explain what the supposedly fixed prize must keep fixed for the elicitation argument to work. Avoid treating the agent's belief as changed by its reporting incentive. At most 220 words.",
+      "path": "questions/batch26/b26-03.md",
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba"
+    },
+    {
+      "id": "b26-04",
+      "type": "aggregation-audit",
+      "prompt": "Two experts give probabilities for three mutually exclusive, exhaustive deployment outcomes:\n\n| Outcome | Expert A | Expert B |\n|---|---:|---:|\n| Safe, subtype 1 | 9/20 | 1/20 |\n| Safe, subtype 2 | 1/20 | 9/20 |\n| Unsafe | 1/2 | 1/2 |\n\nAn aggregator assigns each outcome a weight equal to the square root of the product of the two expert probabilities, then normalizes the weights to sum to one.\n\nA designer argues: \u201cThe experts unanimously assign probability 1/2 to safety. It therefore cannot matter whether we first combine the two safe subtypes within each expert's report and pool the resulting binary reports, or instead pool the three-outcome reports and then combine the pooled safe subtypes. If these routes disagree, one of the resulting reports must violate probability coherence.\u201d\n\nAssess both claims. Give the two safety probabilities and explain what the disagreement, if any, shows about the pooling rule. Do not assume that disagreement within a safe event is normatively irrelevant; assess the stated invariance and coherence claims. At most 200 words.",
+      "path": "questions/batch26/b26-04.md",
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc"
+    },
+    {
+      "id": "b26-05",
+      "type": "identification-guarantee",
+      "prompt": "A lab studies the causal effect of a binary training intervention T on model performance Y. An unobserved initial property U affects which intervention a model receives and also affects Y. A measured intermediate representation M intercepts all causal effects of T on Y. The complete graph is U \u2192 T, U \u2192 Y, T \u2192 M and M \u2192 Y, with no other confounding. Unlimited observational records of T, M and Y are available, with both T values represented.\n\nThe lab learns a decoder that recovers T exactly from every representation M that occurs in the observational population. There is a single fixed decoding function, and its correctness is guaranteed on that entire population. A researcher argues:\n\n\u201cThis strengthens the case for front-door adjustment. Our mediator fully transmits the training intervention's influence, and the decoder proves it loses none of the intervention information. There is no confounding of T\u2192M, and controlling T blocks confounding of M\u2192Y. We can therefore identify the causal effect of T on Y from the observational distribution alone; we need neither randomized training nor new interventions on M.\u201d\n\nAssess this identification claim. Explain whether the decoder property helps in the way asserted. The functional mechanisms are not otherwise known; only the graph, decoder property and observed distribution are supplied. At most 220 words.",
+      "path": "questions/batch26/b26-05.md",
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c"
+    }
+  ],
+  "models": [
+    "anthropic/claude-fable-5.1",
+    "anthropic/claude-opus-5",
+    "google/gemini-3.1-pro-preview",
+    "moonshotai/kimi-k3",
+    "deepseek/deepseek-v4-pro"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "started_at": "2026-09-16T16:35:25.588590+00:00",
+  "arguments": {
+    "items": "tests/sets/support_confirm",
+    "models": "deepseek/deepseek-v4-pro",
+    "n": 3,
+    "run": "support_confirm_deepseek_high_20260917",
+    "max_tokens": 16000,
+    "reasoning_effort": "high",
+    "concurrency": 3,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b24-02",
+      "type": "correction-audit",
+      "prompt": "A lab randomly assigns models to one of two training regimes, R=0 or R=1. It records an intermediate binary flag M and a later behavioral outcome Y. The complete causal graph is R \u2192 M \u2192 Y, together with R \u2192 Y; the background disturbances are mutually independent. Only models with M=0 enter the research archive. The archive records R, M and Y without error. Both regime values have strictly positive probability in the archive, and arbitrarily many archived records are available.\n\nA reviewer says that conditioning on M creates collider bias. The lab replies:\n\n\u201cM is a mediator, not a collider. Although the archive alone does not generally identify R's total effect in the source population, it identifies the effect of changing R while intervening to hold M at zero. That controlled direct effect is the difference between the two regime-specific mean outcomes in the archive.\u201d\n\nAssess the reply under the supplied causal model. State whether its direct-effect conclusion follows and distinguish it from a conclusion about letting M respond naturally to a regime change. At most 180 words.",
+      "path": "tests/sets/support_confirm/b24-02.md",
+      "prompt_sha256": "49d114da444cdceeae6f7d8a62eeafa8c7a86242ef07856d08d7504d07addba4"
+    },
+    {
+      "id": "b25-01",
+      "type": "identification-guarantee",
+      "prompt": "A lab randomizes models between training regimes R=0 and R=1, with positive assignment probabilities. The complete causal graph for an intermediate binary flag M and later outcome Y is R \u2192 M \u2192 Y together with R \u2192 Y, with mutually independent background disturbances. Only M=0 models are archived. The archive records all three variables without error and can be made arbitrarily large. The regime composition of the archive has not been reported; flag computation is allowed to be deterministic.\n\nA reviewer incorrectly calls M a collider. The lab replies: \u201cM is a mediator and there is no hidden mediator\u2013outcome confounding. Those facts, together with random assignment of R, guarantee that the archive identifies the causal effect of changing R while intervening to keep M at zero. We only need more archived data to estimate it accurately.\u201d\n\nDoes this identification guarantee follow from the supplied facts? Assess the correction and the positive conclusion separately. Give a short possible mechanism if needed; do not assume additional facts about archive composition. At most 180 words.",
+      "path": "tests/sets/support_confirm/b25-01.md",
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969"
+    }
+  ],
+  "models": [
+    "deepseek/deepseek-v4-pro"
+  ]
+}

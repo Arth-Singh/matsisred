@@ -1,0 +1,57 @@
+{
+  "started_at": "2026-09-16T16:23:16.601644+00:00",
+  "arguments": {
+    "items": "questions/batch25",
+    "models": "anthropic/claude-fable-5.1,anthropic/claude-opus-5,google/gemini-3.1-pro-preview,moonshotai/kimi-k3,deepseek/deepseek-v4-pro",
+    "n": 1,
+    "run": "batch25_support_high_20260917",
+    "max_tokens": 16000,
+    "reasoning_effort": "high",
+    "concurrency": 5,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b25-01",
+      "type": "identification-guarantee",
+      "prompt": "A lab randomizes models between training regimes R=0 and R=1, with positive assignment probabilities. The complete causal graph for an intermediate binary flag M and later outcome Y is R \u2192 M \u2192 Y together with R \u2192 Y, with mutually independent background disturbances. Only M=0 models are archived. The archive records all three variables without error and can be made arbitrarily large. The regime composition of the archive has not been reported; flag computation is allowed to be deterministic.\n\nA reviewer incorrectly calls M a collider. The lab replies: \u201cM is a mediator and there is no hidden mediator\u2013outcome confounding. Those facts, together with random assignment of R, guarantee that the archive identifies the causal effect of changing R while intervening to keep M at zero. We only need more archived data to estimate it accurately.\u201d\n\nDoes this identification guarantee follow from the supplied facts? Assess the correction and the positive conclusion separately. Give a short possible mechanism if needed; do not assume additional facts about archive composition. At most 180 words.",
+      "path": "questions/batch25/b25-01.md",
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969"
+    },
+    {
+      "id": "b25-02",
+      "type": "identification-guarantee",
+      "prompt": "A lab observes a model's initial configuration C, whether it receives a training intervention T, and its final performance Y. C and T are binary. The complete causal graph is C \u2192 T, C \u2192 Y and T \u2192 Y, with independent background disturbances and no hidden variables. Thus C is the only confounder of T and Y. The observational dataset is error-free and unlimited. Both values of C and both values of T occur in it, but their joint frequencies have not been supplied. Training assignment may be deterministic given configuration.\n\nA reviewer objects that observational data can never answer the causal question. The lab responds: \u201cThat objection ignores our measured confounder. Adjusting for C blocks every back-door path. Consequently the facts above guarantee that the population effect of assigning T=1 rather than T=0 is identifiable from this dataset. Randomizing T would improve precision but is not needed for identification.\u201d\n\nAssess the lab's claimed guarantee. Distinguish whether its adjustment variable is causally appropriate from whether the required information is available. A short counterexample is welcome. At most 190 words.",
+      "path": "questions/batch25/b25-02.md",
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd"
+    },
+    {
+      "id": "b25-03",
+      "type": "identification-guarantee",
+      "prompt": "A training intervention T affects a measured intermediate representation M, which affects performance Y. An unobserved initial property U affects both T and Y. The complete causal graph is U \u2192 T, U \u2192 Y, T \u2192 M and M \u2192 Y. There are no other edges or common causes. T and M are binary, Y is numeric, and unlimited error-free observational records of T, M and Y are available. Both values of T and M occur in the data. No joint-support condition is granted; M may be a deterministic function of T.\n\nA researcher argues: \u201cAlthough T and Y are confounded, M intercepts every directed path from T to Y. There is no unblocked back-door path from T to M, and T blocks every back-door path from M to Y. These graphical facts alone guarantee that the population causal effect of T on Y can be recovered from our observed distribution by front-door adjustment.\u201d\n\nIs the claimed guarantee warranted for every data-generating process allowed here? Explain any distinction between satisfying the graphical pattern and having the observational information its formula requires. Do not add another confounder. At most 220 words.",
+      "path": "questions/batch25/b25-03.md",
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423"
+    },
+    {
+      "id": "b25-04",
+      "type": "identification-guarantee",
+      "prompt": "A lab transfers an AI safety evaluation from a source population to a target population. Two binary context features A and B are recorded perfectly. The lab knows that the conditional outcome mechanism for Y given the complete pair (A,B) is identical in source and target; there is no concept shift, measurement error or hidden omitted feature. Unlimited labeled source data and unlimited unlabeled target data are available. Both possible values of each feature occur in the source. The lab has not supplied a joint coverage condition.\n\nThe lab argues: \u201cEvery relevant feature value is represented, and the outcome relationship does not change across populations. Therefore we can always identify target mean Y by reweighting the source to match the target feature distribution. Any remaining limitation is finite-sample accuracy.\u201d\n\nDoes that conclusion follow? If not, give a tiny source/target example preserving all stated facts and explain what more is needed. At most 190 words.",
+      "path": "questions/batch25/b25-04.md",
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833"
+    },
+    {
+      "id": "b25-05",
+      "type": "identification-guarantee",
+      "prompt": "A lab observes a model's initial configuration C, training intervention T and performance Y. C and T are binary. The complete causal graph is C \u2192 T, C \u2192 Y and T \u2192 Y, with mutually independent background disturbances and no hidden variables. The observational dataset is error-free and unlimited. Every pair (C,T) has strictly positive probability.\n\nThe lab proposes estimating the population effect of assigning T=1 rather than T=0 by taking the treatment contrast within each configuration and averaging these contrasts using the population frequencies of C. A reviewer objects: \u201cTreatment was not randomized. Conditioning on C cannot turn observational training choices into interventions, so the effect is still unidentified.\u201d\n\nAssess the objection under the supplied model. Explain what the measured configuration and the positive joint probabilities do, without claiming that all observational comparisons are causal. At most 160 words.",
+      "path": "questions/batch25/b25-05.md",
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99"
+    }
+  ],
+  "models": [
+    "anthropic/claude-fable-5.1",
+    "anthropic/claude-opus-5",
+    "google/gemini-3.1-pro-preview",
+    "moonshotai/kimi-k3",
+    "deepseek/deepseek-v4-pro"
+  ]
+}

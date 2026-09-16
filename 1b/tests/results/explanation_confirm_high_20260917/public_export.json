@@ -1,0 +1,8 @@
+{
+  "source_raw_sha256": "ccdf8685b8900bec2c1ac2c15f3971d59ba184cf638c61f7712e1db5b7d92983",
+  "removed_fields": [
+    "reasoning"
+  ],
+  "preserved": "All final answers, errors, exclusions, prompt hashes, model identifiers, settings, usage and timing fields. No samples dropped.",
+  "records": 18
+}

@@ -1,0 +1,35 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b25-04",
+      "model": "openai/gpt-6-astra-pro",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "No. **Marginal feature coverage does not imply joint coverage.**\n\nConsider:\n- Source: \\((A,B)=(0,0)\\) or \\((1,1)\\), each with probability \\(1/2\\); all observed outcomes are \\(Y=0\\).\n- Target: \\((A,B)=(0,1)\\) or \\((1,0)\\), each with probability \\(1/2\\).\n\nBoth values of each feature occur in the source. Yet two possible outcome mechanisms, each identical across source and target, fit all available data:\n1. \\(Y=0\\) for every pair.\n2. \\(Y=\\mathbf{1}\\{A\\ne B\\}\\).\n\nTheir target means are respectively **0 and 1**. Thus the target mean is not identified, even with unlimited data. Reweighting cannot create source observations in missing joint cells.\n\nFor unrestricted outcome mechanisms, what is needed is **joint support overlap**:\n\\[\nP_T(A=a,B=b)>0\\implies P_S(A=a,B=b)>0.\n\\]\nThen invariance permits identification by\n\\[\nE_T[Y]=\\sum_{a,b}E_S[Y\\mid a,b]P_T(a,b).\n\\]\n\nWithout joint overlap, identification requires additional restrictions that determine outcomes in unsupported cells, or labeled target data there. This is an identification limitation, not merely finite-sample inaccuracy.",
+      "target_grade": "pass",
+      "explanation_grade": "pass",
+      "note": "Correct target and supporting explanation."
+    },
+    {
+      "item": "b25-01",
+      "model": "openai/gpt-6-astra-pro",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "The correction is right: **M is a mediator, not a collider** in the supplied graph. The identification guarantee, however, does not follow.\n\nWith independent disturbances, **if both regimes have positive probability in the archive**, the controlled mean effect is identified by\n\\[\nE[Y\\mid R=1,M=0]-E[Y\\mid R=0,M=0].\n\\]\nBut randomized assignment with positive probabilities does not guarantee that both regimes survive the restriction to \\(M=0\\).\n\nFor example, let \\(M=R\\). Compare two binary-outcome mechanisms:\n- \\(Y=R\\lor M\\) (logical OR);\n- \\(Y=R\\land M\\) (logical AND).\n\nBoth respect the stated graph and can have mutually independent, degenerate disturbances for \\(M\\) and \\(Y\\). Both produce exactly the same archive: only \\((R,M,Y)=(0,0,0)\\). Yet under intervention fixing \\(M=0\\), changing \\(R\\) from 0 to 1 changes \\(Y\\) by 1 in the first mechanism and 0 in the second.\n\nThus the missing ingredient is **support within the archive**. More archived data cannot repair a structural absence of one regime.",
+      "target_grade": "pass",
+      "explanation_grade": "pass",
+      "note": "Correct target and supporting explanation."
+    },
+    {
+      "item": "b27-02",
+      "model": "openai/gpt-6-astra-pro",
+      "sample": 0,
+      "prompt_sha256": "d2a8891572dacf86b4473f1575048157943a0ecd52357439b283f58115d69402",
+      "answer": "The repair fixes **support, not causal identification**. Both \\(N\\) values occur under each \\(T\\), so the proposed front-door adjustment has the required observed overlap. But its graphical conditions fail.\n\nThe augmented graph retains \\(T\\to M\\to Y\\) and adds \\(M\\to N\\). Therefore:\n\n- \\(N\\) does **not** intercept the causal path from \\(T\\) to \\(Y\\).\n- \\(N\\leftarrow M\\to Y\\) is a back-door path from \\(N\\) to \\(Y\\) that conditioning on \\(T\\) does not graphically block.\n\nIndependent sensor randomness introduces no new common cause, but it neither removes these paths nor turns the readout into a mediator.\n\nFor a concrete nonidentification example, let \\(U\\sim\\mathrm{Bernoulli}(1/2)\\), \\(T=U\\), \\(M=T\\), and let \\(N\\) independently flip \\(M\\) with probability \\(1/4\\). Compare two outcome models:\n\\[\nY=M(1-U),\\qquad Y=U(1-M).\n\\]\nBoth obey the original graph and yield exactly the same observed distribution: \\(Y=0\\) always, with full overlap for \\(T,N\\). Nevertheless, their average effects\n\\[\nE[Y\\mid do(T=1)]-E[Y\\mid do(T=0)]\n\\]\nare respectively \\(+1/2\\) and \\(-1/2\\).\n\nThus graphical validity and support are **not jointly satisfied**. Unlimited data eliminate sampling uncertainty, not this causal ambiguity.",
+      "target_grade": "pass",
+      "explanation_grade": "pass",
+      "note": "Correct target and supporting explanation."
+    }
+  ]
+}

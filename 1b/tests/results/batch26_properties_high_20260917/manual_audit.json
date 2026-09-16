@@ -1,0 +1,265 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b26-01",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c",
+      "answer": "No. For \\(P\\), every final welfare vector is \\((1,0)\\), so after sorting it is always \\((0,1)\\). For \\(Q\\), each coin outcome is also either \\((1,0)\\) or \\((0,1)\\), which likewise sorts to \\((0,1)\\). Thus the proposed representation assigns both policies the same distribution. An evaluation based only on that representation cannot strictly prefer \\(Q\\).\n\nThe two requirements are not inconsistent. \u201cRenaming recipients must not matter\u201d does not require literally deleting all recipient-identifying information. It requires the evaluation to be invariant under permutations of recipients. Identity information may therefore be used, provided the rule treats permuted identities symmetrically.\n\nThe distinction is between **anonymous final outcomes** and **anonymous treatment of recipients\u2019 chances**. The proposed representation preserves only the former; \\(P\\) and \\(Q\\) differ crucially in the latter.\n\nA simple rule is to evaluate policies using recipients\u2019 expected welfare, with a permutation-invariant equity criterion. For example, rank policies lexicographically by the least recipient\u2019s expected welfare:\n\n\\[\nP:(1,0),\\qquad Q:\\left(\\tfrac12,\\tfrac12\\right).\n\\]\n\nSince \\(\\min(P)=0<\\tfrac12=\\min(Q)\\), the rule strictly prefers \\(Q\\), while any renaming merely reorders the expected-welfare vector and leaves the evaluation unchanged.",
+      "target_grade": "pass",
+      "note": "Correct anonymity/statewise-sorting distinction and compatible fairness rule.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-01",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c",
+      "answer": "The proposed representation is insufficient, but the requirements themselves are perfectly consistent.\n\nUnder the designers' proposal, Policy P yields the sorted ex-post welfare vector (0, 1) with 100% probability. Policy Q yields the exact same sorted vector (0, 1) in both possible coin-flip outcomes, meaning Q\u2019s aggregate representation is also a 100% chance of (0, 1). Because P and Q share identical representations, the system cannot strictly prefer Q over P. The proposal fails because it applies anonymity *ex-post* (after outcomes are realized), improperly discarding information about *ex-ante* fairness (who held the chances).\n\nThe requirements are consistent; the flaw lies only in the representation. Anonymity requires that swapping names does not change the evaluation, which does not preclude valuing fair chances. \n\nTo satisfy both requirements, a system can represent a policy by the sorted vector of recipients' *expected* (ex-ante) welfares. For P, the expected welfares are Ada=1, Bo=0; the sorted vector is (0, 1). For Q, the expected welfares are Ada=0.5, Bo=0.5; the sorted vector is (0.5, 0.5). An evaluation rule that maximizes the lowest expected welfare (ex-ante maximin) will strictly prefer Q (minimum 0.5) over P (minimum 0) while treating all identities as perfectly interchangeable, fulfilling both design constraints.",
+      "target_grade": "pass",
+      "note": "Correct anonymity/statewise-sorting distinction and compatible fairness rule.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-01",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c",
+      "answer": "**No, the representation fails; but the requirements are consistent.**\n\n**Why it fails.** Under P, the outcome is Ada 1, Bo 0 \u2014 sorted, (0,1) with probability 1. Under Q, each of the two states also sorts to (0,1), so Q is again (0,1) with probability 1. The two policies have identical representations, so *any* rule defined on this data must rank them equally. Strict preference for the lottery is then unattainable.\n\n**What was actually discarded.** Sorting *state by state* destroys more than names: it destroys the link between a person and their prospect across states \u2014 each person's ex ante distribution of welfare. Anonymity only demands invariance under a *single* permutation applied to the whole policy, not under independent relabelings inside each state. Correct quotient: distributions over named welfare vectors, modulo one global permutation.\n\n**Why no inconsistency.** Anonymity requires P ~ P\u2032 (Bo gets it certainly), since P\u2032 is P relabeled. Q is not a relabeling of P; it is the even mixture of P and P\u2032. Ranking a mixture strictly above its symmetric ingredients is non-linearity in probabilities, not a violation of symmetry.\n\n**Example rule.** Take each person's *expected* welfare, sort the vector, apply the maximin (or a strictly concave sum). P \u2192 (0,1), value 0; Q \u2192 (\u00bd,\u00bd), value \u00bd. So Q \u227b P ~ P\u2032: anonymous, and strictly lottery-preferring.",
+      "target_grade": "pass",
+      "note": "Correct anonymity/statewise-sorting distinction and compatible fairness rule.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-01",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c",
+      "answer": "**No, the representation is insufficient.** Under P, the only outcome is (Ada 1, Bo 0), which sorts to (0, 1) with probability 1. Under Q, both outcomes\u2014(1, 0) and (0, 1)\u2014also sort to (0, 1), so the sorted-vector distribution is again (0, 1) with probability 1. P and Q receive identical representations, so any evaluation built on it must rank them equally, violating the second requirement.\n\n**The requirements are not inconsistent.** The designers conflated two different things:\n\n- *Anonymity* is a symmetry condition on the evaluation function: permuting names across the whole policy must leave the score unchanged.\n- *State-wise sorting* is a stronger informational restriction: it discards which person occupies which position *in each state*, and hence destroys all cross-state information about how risk is distributed among persons. Q spreads risk; P concentrates it. That difference lives precisely in the identity linkages across states.\n\nAnonymity only forbids the evaluation from caring *which* person bears the risk, not *whether* it is shared.\n\n**A rule satisfying both:** compute each recipient's expected welfare, then evaluate that vector symmetrically, e.g. V = minimum expected welfare (or any Schur-concave function of the expectations). P gives expectations (1, 0), so V = 0; Q gives (\u00bd, \u00bd), so V = \u00bd. Renaming merely permutes the expectation vector, leaving V unchanged; the fair lottery is strictly preferred.",
+      "target_grade": "pass",
+      "note": "Correct anonymity/statewise-sorting distinction and compatible fairness rule.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-01",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "663d69764e5428e7e326d942b156fb03bc8c6cac786048c8eb110b88ee812d1c",
+      "answer": "The proposed representation fails the second requirement. Under policy P, the sorted welfare vector is (0,1) with probability 1. Under policy Q, the coin yields either (Ada:1, Bo:0) or (Ada:0, Bo:1) \u2013 both sort to (0,1) with probability 1. The distributions are identical, so the representation cannot express a strict preference for the fair lottery.\n\nThe requirements themselves are not inconsistent. They demand both anonymity and sensitivity to ex\u2011ante fairness, while the representation only captures ex\u2011post distributions of welfare. An evaluation rule can satisfy both by using individuals\u2019 expected utilities. For example, sort the vector of expected utilities (P: (0,1); Q: (0.5,0.5)) and apply a symmetric strictly concave social welfare function such as the sum of square roots. This yields \\(\\sqrt{0}+\\sqrt{1}=1\\) for P and \\(2\\sqrt{0.5}\\approx1.414\\) for Q, strictly preferring Q while ignoring identities. The key distinction is between ex\u2011post outcome distributions and ex\u2011ante prospects.",
+      "target_grade": "pass",
+      "note": "Correct anonymity/statewise-sorting distinction and compatible fairness rule.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-02",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90",
+      "answer": "**No \u2014 the claim is false.**\n\n**The implemented policy.** After red, conditional expected utilities of the project are 3/4 under M and 1/4 under N, so the minimum is 1/4 < 0.4: take the fallback. After blue the numbers swap, minimum again 1/4: fallback. So the implementation yields \"always fallback,\" guaranteed value 0.4.\n\n**The alternative.** \"Always do the project\" has ex ante expected utility \u00bd\u00b7\u00be + \u00bd\u00b7\u00bc = 0.5 under M, and equally 0.5 under N. Its minimum across the two models is 0.5 > 0.4. In fact each model *individually* rates it above the implemented policy, so the implemented policy is ex ante dominated, not merely a different trade-off.\n\n**What went wrong.** The conditioning is correct; the error is interchanging minimization with the expectation over signals. Ex ante maximin forces the adversary to commit to a single model that must apply to both branches. Branch-wise maximin lets the worst case be M on the blue branch and N on the red branch \u2014 effectively an adversary who switches models between signals, a strictly stronger opponent than either M or N. By the minimax inequality, E[min] \u2264 min E, so branch-wise optimization can only lower the guarantee.\n\n**Upshot.** Maximin over a fixed model set is not dynamically consistent and does not decompose into independent per-signal problems. With precommitment available, the committee should evaluate whole signal-contingent policies.",
+      "target_grade": "pass",
+      "note": "Correct .4 versus .5 policy comparison and min/averaging distinction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-02",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90",
+      "answer": "**No \u2014 the claim is incorrect.**\n\n**Implemented policy.** After red, project's conditional expected utility is 3/4 (M) or 1/4 (N); the minimum, 1/4, is below 0.4, so the engineers choose the fallback. Blue is symmetric (1/4 vs 3/4), so again fallback. The implemented policy is \"always fallback,\" worth 0.4 under both models.\n\n**Alternative.** \"Always project\" has ex-ante expected utility \u00bd\u00b7\u00be + \u00bd\u00b7\u00bc = 0.5 under M and 0.5 under N. Its worst case is 0.5 > 0.4. In fact it is the maximin-optimal committed policy: for any signal-contingent (even randomized) policy, the average of the M- and N-values is at most 0.5, so no policy's minimum exceeds 0.5. The engineers' policy is strictly dominated under the committee's own objective.\n\n**What changes.** The committee's objective picks one model and holds it fixed across both branches; the adversary must commit to M or N for the whole tree. Branch-wise minimization lets the adversary re-pick the model after seeing the signal \u2014 N on red, M on blue \u2014 a combination neither M nor N licenses. Equivalently, the engineers are implicitly optimizing against the rectangular hull of {M, N}, which contains \"P(H=1)=1/4 on both signals,\" a model the committee never considered. Worst-case reasoning is fine; applying it separately per branch changes the feasible set of adversaries and therefore the objective, sacrificing 0.1 in guaranteed utility.",
+      "target_grade": "pass",
+      "note": "Correct .4 versus .5 policy comparison and min/averaging distinction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-02",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90",
+      "answer": "The implementation claim is **incorrect**. \n\nUnder the engineers\u2019 ex-post implementation, the worst-case conditional expected utility for the project is 0.25 in both branches (Model N for the red signal; Model M for the blue signal). Because 0.4 > 0.25, the implemented policy chooses the fallback regardless of the signal, yielding a minimum ex-ante expected utility of **0.4**.\n\nIn contrast, the committee could precommit to an alternative policy: *always choose the project*. This yields an ex-ante expected utility of **0.5** under *both* models:\n*   Model M: 0.5(0.75) + 0.5(0.25) = 0.5\n*   Model N: 0.5(0.25) + 0.5(0.75) = 0.5\n\nSince 0.5 > 0.4, precommitting to the project strictly outperforms the engineers' implementation according to the original ex-ante objective.\n\n**What changes:** Performing worst-case optimization separately in each branch causes dynamic inconsistency. Ex-post optimization allows the identity of the \"worst-case\" model to shift depending on the observed signal. This effectively assumes nature can malevolently switch the true model mid-stream to minimize your payoff. \n\nEx-ante optimization requires evaluating a policy against fixed models across the entire timeline. Because models M and N perfectly hedge each other\u2014one performs well exactly when the other performs poorly\u2014evaluating the overall policy ex-ante retains this hedge. Local ex-post pessimism destroys the hedge by evaluating each branch under a different model.",
+      "target_grade": "pass",
+      "note": "Correct .4 versus .5 policy comparison and min/averaging distinction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-02",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90",
+      "answer": "The engineers\u2019 claim is incorrect. The ex\u2011ante max\u2011min optimal policy precommits to **always choose the project**, yielding a worst\u2011case expected utility of **0.5** (both models give it exactly 0.5). In contrast, conditioning on each signal and then applying max\u2011min leads to the **fallback after every signal**, because conditional on *red* model N says the project gives only 0.25 (fallback 0.4) and conditional on *blue* model M gives only 0.25. The branch\u2011by\u2011branch policy therefore gives a worst\u2011case of **0.4**, strictly worse.\n\nThe discrepancy arises because max\u2011min expected utility violates dynamic consistency. Precommitment allows you to exploit the fact that the *identity of the worst\u2011case model can flip across signals*. The ex\u2011ante policy \u201calways project\u201d averages out those flips, delivering 0.5 from each model overall. When you force worst\u2011case optimization *separately in each branch*, you myopically protect against whichever model is locally pessimistic, discarding information that would have been useful in the other branch. This leads to an overly conservative, lower\u2011payoff policy even though the same models and worst\u2011case principle are used.",
+      "target_grade": "pass",
+      "note": "Correct .4 versus .5 policy comparison and min/averaging distinction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-03",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba",
+      "answer": "**Not valid.** Compute expected utility of the report r.\n\n- If Y=1 (prob 1/2): wealth 0, prize with prob 1\u2212(1\u2212r)\u00b2, so EU = 2\u00b7[1\u2212(1\u2212r)\u00b2].\n- If Y=0 (prob 1/2): wealth 1, prize with prob 1\u2212r\u00b2, so EU = 3(1\u2212r\u00b2) + 2r\u00b2 = 3 \u2212 r\u00b2.\n\nTotal \u221d 5 \u2212 2(1\u2212r)\u00b2 \u2212 r\u00b2. Derivative: 4(1\u2212r) \u2212 2r = 0 \u21d2 **r = 2/3**, not 1/2.\n\nWhy: the lottery-over-a-fixed-prize trick works because it makes the agent maximize (prob of winning) \u00d7 (utility gain from winning). That yields belief-revelation only if the utility gain from the $1 is the *same in every state of Y*, so it factors out. Here the dollar is worth u(1)\u2212u(0)=2 utility units when Y=1 but u(2)\u2212u(1)=1 when Y=0. The agent therefore weights the Y=1 term twice as heavily as the Y=0 term, and the optimizer behaves as if maximizing the proper score under weights (2\u00b7\u00bd, 1\u00b7\u00bd) \u221d (2/3, 1/3). Its belief remains 1/2; the report is distorted by state-dependent marginal utility of the prize, not by any change in belief.\n\nSo \"fixed prize\" must mean fixed in **utility increment across states**, not fixed in dollars. That requires either outside wealth independent of Y, or utility linear (constant marginal utility). Otherwise binarization removes intra-state risk aversion but not the cross-state hedging motive created by Y-correlated wealth.",
+      "target_grade": "pass",
+      "note": "Correct optimal report2/3 and utility-increment requirement.",
+      "secondary_caveats": [
+        "Risk neutrality or state-independent wealth are sufficient examples, not exhaustive necessary alternatives to ensure equal conditional utility increments."
+      ]
+    },
+    {
+      "item": "b26-03",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba",
+      "answer": "**No, the inference is invalid. The optimizing report is r = 2/3.**\n\n**Computation.** Expected utility, with belief 1/2 held fixed:\n\n- Y=1: wealth 0 or 1 \u2192 u = 0 or 2, so EU\u2081 = 2[1\u2212(1\u2212r)\u00b2].\n- Y=0: wealth 1 or 2 \u2192 u = 2 or 3, so EU\u2080 = 2 + [1\u2212r\u00b2] (the prize adds 1 utile with prob 1\u2212r\u00b2).\n\nEU(r) = \u00bd\u00b72[1\u2212(1\u2212r)\u00b2] + \u00bd(3 \u2212 r\u00b2) = 1.5 + 2r \u2212 1.5r\u00b2.\n\nEU\u2032(r) = 2 \u2212 3r = 0 \u21d2 **r = 2/3**, and EU\u2033 < 0. So the agent overstates P(Y=1).\n\n**What \"fixed prize\" must mean.** Binarization neutralizes risk aversion only if the prize is fixed *in utility terms* \u2014 i.e., the utility increment from winning is the same in both states: u(w\u2081+1) \u2212 u(w\u2081) = u(w\u2080+1) \u2212 u(w\u2080). A fixed *dollar* prize is not enough. Here background wealth is state-dependent (0 vs 1) and u is concave, so winning is worth 2 utiles if Y=1 but only 1 utile if Y=0.\n\nThe agent then effectively maximizes a quadratic score under risk-neutral-equivalent weights proportional to p\u00b7\u0394\u2081 = \u00bd\u00b72 and (1\u2212p)\u00b7\u0394\u2080 = \u00bd\u00b71, i.e. (2/3, 1/3) \u2014 hence r = 2/3. Belief is unchanged; only the incentive is distorted by state-dependent marginal utility.",
+      "target_grade": "pass",
+      "note": "Correct optimal report2/3 and utility-increment requirement.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-03",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba",
+      "answer": "The evaluator\u2019s inference is **invalid**. The optimizing report is **$r = 2/3$**. \n\nWhile binarization (paying in probabilities of a prize) successfully neutralizes risk aversion regarding the prize itself by making the objective linear in probability, the evaluator ignores the agent's state-dependent outside wealth. \n\nFor the elicitation argument to work, the supposedly fixed prize must keep the **utility increment (the marginal utility gained from winning)** strictly fixed across all states of the event $Y$. If the value of winning shifts depending on the event, the agent will hedge.\n\nHere, the agent's initial wealth depends on $Y$, meaning the $1 prize provides different utility increments:\n* If $Y=1$, initial wealth is $0$. Winning the prize adds $u(1) - u(0) = 2 - 0 = 2$ utils. \n* If $Y=0$, initial wealth is $1$. Winning the prize adds $u(2) - u(1) = 3 - 2 = 1$ util.\n\nThe agent maximizes expected utility given its true belief $P(Y=1) = 1/2$:\n$EU(r) = \\frac{1}{2}[2(1 - (1-r)^2) + 0] + \\frac{1}{2}[1(1 - r^2) + 2]$\n\nSimplifying this yields $EU(r) = \\frac{1}{2}[4r - 3r^2 + 3]$. \n\nTaking the derivative with respect to $r$ and setting it to zero gives $4 - 6r = 0$, or $r = 2/3$. The agent rationally skews its report toward $Y=1$ because winning the prize is twice as valuable in that state.",
+      "target_grade": "pass",
+      "note": "Correct optimal report2/3 and utility-increment requirement.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-02",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "23ad1243a8491a0b0cc55f7a76eccbc08f633289a397253b40b6b8d5cfd78a90",
+      "answer": "No.\n\nThe engineers\u2019 branchwise rule chooses the fallback after either signal:\n\n- **Red:** project has worst-case value \\(\\min(3/4,1/4)=1/4\\), below \\(0.4\\).\n- **Blue:** project likewise has worst-case value \\(1/4\\), below \\(0.4\\).\n\nThus the implemented policy is \u201cfallback regardless of signal,\u201d with ex ante worst-case utility \\(0.4\\).\n\nHowever, the committee could precommit to **undertake the project regardless of signal**. Under either model, the prior probability of \\(H=1\\) is\n\n\\[\n\\frac12\\left(\\frac34\\right)+\\frac12\\left(\\frac14\\right)=\\frac12.\n\\]\n\nHence that policy has expected utility \\(1/2\\) under both \\(M\\) and \\(N\\), so its worst-case value is \\(1/2>0.4\\). It strictly dominates the implemented policy under the committee\u2019s original objective.\n\nThe discrepancy is dynamic inconsistency: optimizing the worst case separately after each signal is not equivalent to optimizing the minimum of each model\u2019s ex ante expected utility. Branchwise, the unfavorable model differs by signal\u2014\\(N\\) after red and \\(M\\) after blue\u2014so the fallback is selected on both branches. Ex ante optimization instead compares complete policies model by model, allowing the favorable posterior in one branch to offset the unfavorable posterior in the other. No third model is needed.",
+      "target_grade": "pass",
+      "note": "Correct .4 versus .5 policy comparison and min/averaging distinction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-04",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc",
+      "answer": "**Computation**\n\n*Coarsen then pool:* both experts report Safe = 1/2, Unsafe = 1/2; geometric weights \u221a(\u00bc)=\u00bd each; pooled P(Safe) = **1/2**.\n\n*Pool then coarsen:* weights \u221a(9/20\u00b71/20)=3/20, \u221a(1/20\u00b79/20)=3/20, \u221a(\u00bc)=10/20; total 16/20; normalized 3/16, 3/16, 10/16. Pooled P(Safe) = 6/16 = **3/8**.\n\n**Assessment**\n\n1. *Invariance claim \u2014 false.* Geometric (log-linear) pooling is not marginalization-invariant: it does not commute with coarsening the outcome partition. Unanimity on the coarse event does not survive when the fine-grained reports are pooled, because the geometric mean of disagreeing subtype probabilities is strictly below their arithmetic mean, and renormalization shifts mass to the outcome on which experts agree (Unsafe). Only linear pooling has this invariance in general.\n\n2. *Coherence claim \u2014 false.* Both outputs (1/2, 1/2) and (3/16, 3/16, 5/8) are nonnegative and sum to one; each is a perfectly coherent distribution. The disagreement is a property of the pooling *rule* (path-dependence on how outcomes are described), not a defect in either resulting report.\n\nWhether penalizing safety for within-safe disagreement is desirable is a separate normative question\u2014one may argue subtype disagreement signals weaker evidence\u2014but the designer's stated reasoning is unsound on both counts.",
+      "target_grade": "pass",
+      "note": "Correct .5 versus3/8; both outputs probability-coherent.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-04",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc",
+      "answer": "## The two numbers\n\n**Route 1 \u2014 pool the fine-grained reports, then add the safe subtypes.**\nUnnormalized weights: \u221a(9/20\u00b71/20) = 3/20, \u221a(1/20\u00b79/20) = 3/20, \u221a(1/2\u00b71/2) = 1/2. Sum = 4/5.\nNormalized: 3/16, 3/16, 10/16. **P(safe) = 6/16 = 3/8.**\n\n**Route 2 \u2014 coarsen first, then pool.**\nBoth experts report (1/2, 1/2); geometric pooling of identical reports returns them. **P(safe) = 1/2.**\n\n## Assessing the claims\n\n*Invariance claim: false.* Geometric (log-linear) pooling is not invariant under coarsening/refinement of the partition. The normalizing constant depends on the whole vector, so disagreement *within* the safe event \u2014 A and B swap the subtypes \u2014 shrinks the safe weights (geometric mean 3/20 < arithmetic 1/4) while the unanimous unsafe cell keeps its full weight 1/2. Mass migrates to \"unsafe.\" Only linear pooling is generally marginalization-invariant.\n\n*Coherence claim: false.* Both outputs are non-negative and sum to one; (3/16, 3/16, 10/16) and (1/2, 1/2) are perfectly coherent probability functions. They are coherent answers to *different* aggregation problems.\n\nSo the disagreement reveals a genuine modelling choice \u2014 which partition the rule is applied to must be specified \u2014 and whether subtype disagreement *should* count against safety is a substantive judgement, not a coherence violation.",
+      "target_grade": "pass",
+      "note": "Correct .5 versus3/8; both outputs probability-coherent.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-04",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc",
+      "answer": "The **binary safety probability is 1/2**. If we combine subtypes first, both experts report (Safe: 1/2, Unsafe: 1/2). The geometric mean is 1/2 for both outcomes, which normalizes to 1/2. \n\nThe **ternary safety probability is 3/8**. If we pool the three outcomes first, the unnormalized weights are:\n*   Safe 1: $\\sqrt{9/20 \\times 1/20} = 3/20$\n*   Safe 2: $\\sqrt{1/20 \\times 9/20} = 3/20$\n*   Unsafe: $\\sqrt{1/2 \\times 1/2} = 10/20$\nThese sum to $16/20$. Normalizing gives Safe 1 = 3/16, Safe 2 = 3/16, and Unsafe = 10/16. Summing the pooled safe subtypes yields 6/16, or 3/8.\n\nBoth of the designer's claims are false:\n1.  **Invariance:** The routes disagree (1/2 $\\neq$ 3/8). \n2.  **Coherence:** Neither result violates probability coherence. Both resulting distributions sum to 1 and have non-negative probabilities, fulfilling the axioms of probability.\n\nThis disagreement demonstrates that geometric (logarithmic) pooling violates the **marginalization property**. Unlike linear pooling, geometric pooling is sensitive to how events are partitioned. Because the experts strongly disagree on the specific *subtypes* of safety, the multiplicative rule penalizes the parent \"Safe\" category, suppressing its aggregate probability compared to when the internal disagreement is hidden.",
+      "target_grade": "pass",
+      "note": "Correct .5 versus3/8; both outputs probability-coherent.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-03",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba",
+      "answer": "No. The belief remains \\(P(Y=1)=1/2\\); the report only affects the prize draw.\n\nThe expected utility is\n\\[\n\\begin{aligned}\nEU(r)\n&=\\tfrac12\\left[(2r-r^2)u(1)+(1-2r+r^2)u(0)\\right]\\\\\n&\\quad+\\tfrac12\\left[(1-r^2)u(2)+r^2u(1)\\right]\\\\\n&=\\tfrac32+2r-\\tfrac32r^2.\n\\end{aligned}\n\\]\nThus\n\\[\nEU'(r)=2-3r,\n\\]\nso the unique optimum is\n\\[\n\\boxed{r=\\frac23}.\n\\]\n\nThe Brier binarization is incentive compatible when the prize has the same **utility increment** in both states. Here it does not:\n\n- If \\(Y=1\\), wealth rises from \\(0\\) to \\(1\\): utility gain \\(u(1)-u(0)=2\\).\n- If \\(Y=0\\), wealth rises from \\(1\\) to \\(2\\): utility gain \\(u(2)-u(1)=1\\).\n\nHence winning is more valuable in the \\(Y=1\\) state, and the agent shades its report upward.\n\nFor the standard argument, \u201cfixed prize\u201d must mean fixed in utility\u2014or equivalently the state-contingent marginal utility gain from winning must be identical. Fixing only its dollar denomination is insufficient when initial wealth varies with \\(Y\\) and utility is nonlinear.",
+      "target_grade": "pass",
+      "note": "Correct optimal report2/3 and utility-increment requirement.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-03",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "ee3614a47ec5bb8e89468e26bfe5e6f21ddbad02d18de2a29d1be71c4ac1f3ba",
+      "answer": "The inference is invalid. The agent\u2019s optimal report is **r = 2/3**, not its true belief 1/2.  \n\nTo see why, compute expected utility. If Y=1, initial wealth is $0; winning the $1 prize yields final wealth $1 (utility 2). The win probability is 1\u2212(1\u2212r)\u00b2, so expected utility given Y=1 is 2\u00b7[1\u2212(1\u2212r)\u00b2]. If Y=0, initial wealth is $1; winning yields final wealth $2 (utility 3) and losing yields $1 (utility 2). Win probability is 1\u2212r\u00b2, so expected utility given Y=0 is 3\u00b7(1\u2212r\u00b2)+2\u00b7r\u00b2 = 3\u2212r\u00b2. With P(Y=1)=1/2, overall expected utility is \u00bd[2\u22122(1\u2212r)\u00b2 + 3\u2212r\u00b2] = \u00bd(3+4r\u22123r\u00b2). The maximum occurs at r=2/3.  \n\nThe evaluator\u2019s mistake: a \u201cfixed prize\u201d of $1 does **not** provide a fixed utility increment across states. Because initial wealth is state\u2011dependent ($0 vs. $1), the marginal utility of an extra dollar differs: winning raises utility by +2 when Y=1 (from 0 to 2) but only by +1 when Y=0 (from 2 to 3). A proper scoring rule incentivizes truth\u2011telling only if the reward\u2019s *utility value* is held constant across events, which requires either risk neutrality or state\u2011independent background wealth. Here, the state\u2011varying wealth breaks that requirement, distorting the report toward overstating the probability of the state where the prize has higher utility impact (Y=1). The argument must fix the *utility* of the prize, not just its dollar amount.",
+      "target_grade": "pass",
+      "note": "Correct optimal report2/3 and utility-increment requirement.",
+      "secondary_caveats": [
+        "Risk neutrality or state-independent wealth are sufficient examples, not exhaustive necessary alternatives to ensure equal conditional utility increments."
+      ]
+    },
+    {
+      "item": "b26-05",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c",
+      "answer": "**The claim is backwards: the decoder property is exactly what breaks identification.**\n\nThe graphical conditions do hold: M intercepts every directed T\u2192Y path, U\u2192T\u2192M has no backdoor into M (U \u22a5 M | T-relevant paths \u2014 no arrow U\u2192M), and T blocks the M\u2192Y backdoor M \u2190 T \u2190 U \u2192 Y. But the front-door *formula*\n\nP(y|do(t)) = \u03a3_m P(m|t) \u03a3_{t\u2032} P(y|m,t\u2032) P(t\u2032)\n\nalso requires a positivity/overlap condition: P(T=t\u2032, M=m) > 0 for every t\u2032 and every m in the support of P(m|t).\n\nA single fixed decoder that recovers T correctly on the whole observational population means P(T=1|M=m) \u2208 {0,1} for every observed m: the M-supports under T=0 and T=1 are disjoint. Hence P(y|m,t\u2032) is undefined (no data) for the t\u2032 that contradicts m, and the inner sum cannot be evaluated. Conditioning on M is informationally equivalent to conditioning on T, so the U-induced confounding of Y is not removed at all \u2014 the \"adjustment\" degenerates to comparing P(y|T=1) with P(y|T=0).\n\nConsequently the ATE is *not* point-identified; the observational law is compatible with a range of interventional laws (only assumption-free/Manski-type bounds follow). Faithful transmission of the effect and lossless transmission of the *label* are different properties; the decoder certifies the latter, which is a maximal overlap violation. Identification requires randomizing T or intervening on M.",
+      "target_grade": "pass",
+      "note": "Correct rejection of general guarantee: exact treatment decoder implies disjoint mediator support.",
+      "secondary_caveats": [
+        "M can contain additional information beyond T. Conditioning on them is not equivalent; unsupported front-door formula does not literally collapse to confounded contrast."
+      ]
+    },
+    {
+      "item": "b26-04",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc",
+      "answer": "The two routes give different safety probabilities:\n\n- Combine safe subtypes within each expert first:  \n  Expert A safety \\(=9/20+1/20=1/2\\), Expert B safety \\(=1/20+9/20=1/2\\).  \n  Pooling binary safe/unsafe reports gives safety probability \\(1/2\\), unsafe \\(1/2\\).\n\n- Pool three-outcome reports first:  \n  Weights are \\(\\sqrt{(9/20)(1/20)}=3/20\\), \\(\\sqrt{(1/20)(9/20)}=3/20\\), \\(\\sqrt{(1/2)(1/2)}=1/2\\).  \n  Normalized: safe subtype 1 \\(=3/16\\), safe subtype 2 \\(=3/16\\), unsafe \\(=5/8\\).  \n  So pooled safety probability \\(=3/16+3/16=3/8\\).\n\nThe designer\u2019s invariance claim is false: the two routes disagree, giving safety \\(1/2\\) vs \\(3/8\\). The second claim is also false: each resulting report is individually a coherent probability distribution. The disagreement does not show incoherence of either report; it shows the pooling rule violates marginalization/coarsening consistency. The square-root-of-product rule does not preserve linear event marginals when pooling.",
+      "target_grade": "pass",
+      "note": "Correct .5 versus3/8; both outputs probability-coherent.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-05",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c",
+      "answer": "**The claim fails.** The front-door formula is\n\nP(y | do(t)) = \u03a3_m P(m | t) \u03a3_{t\u2032} P(y | m, t\u2032) P(t\u2032).\n\nIts graphical conditions (no unblocked T\u2192M confounding; T blocks M\u2192Y confounding) are indeed satisfied here. But the formula also needs a positivity condition: every M value must occur with *both* T values, so that P(y | m, t\u2032) is defined for t\u2032 \u2260 the treatment that produced m. That inner term is where M is \"randomized\" by comparing units with the same m but different t.\n\nThe decoder property is precisely the violation of this condition. If a fixed function recovers T exactly from every observed M, then the supports of M under T=0 and T=1 are disjoint. For each m, only one value of t\u2032 is ever observed, so P(y | m, t\u2032) is undefined for the other, and the adjustment cannot be computed. Equivalently, M carries no information beyond T itself, so conditioning on T leaves no variation in M with which to separate M\u2192Y from the U\u2192Y confounding path. Different mechanisms (e.g., Y driven by M versus Y driven by U) can generate identical observational distributions while implying different causal effects.\n\nSo the decoder does not strengthen the case\u2014it undermines it. Without functional assumptions, identification requires randomizing T or intervening on M.",
+      "target_grade": "pass",
+      "note": "Correct rejection of general guarantee: exact treatment decoder implies disjoint mediator support.",
+      "secondary_caveats": [
+        "False converse: T=d(M) does not mean M has no information beyond T or no within-T variation. M=(T,Z) is possible; disjoint cross-treatment support remains true."
+      ]
+    },
+    {
+      "item": "b26-04",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "f8c7aebff18989dd8299aea8f58c381706542b1e7c74cd1b9c0d111126c333dc",
+      "answer": "Pooling all three outcomes gives unnormalized weights\n\n\\[\n\\sqrt{\\frac9{20}\\frac1{20}}=\\frac3{20},\\quad\n\\sqrt{\\frac1{20}\\frac9{20}}=\\frac3{20},\\quad\n\\sqrt{\\frac12\\frac12}=\\frac12.\n\\]\n\nTheir sum is \\(4/5\\), so the pooled probabilities are \\(3/16,3/16,5/8\\). Hence\n\n\\[\nP_{\\text{three-first}}(\\text{safe})=3/16+3/16=\\boxed{3/8}.\n\\]\n\nIf each expert\u2019s two safe outcomes are first combined, both experts assign \\(1/2\\) to safe and \\(1/2\\) to unsafe. Geometric pooling then gives equal weights, so\n\n\\[\nP_{\\text{binary-first}}(\\text{safe})=\\boxed{1/2}.\n\\]\n\nThus the designer\u2019s invariance claim is false: the order of pooling and combining matters. The disagreement arises because the rule uses disagreement within safety to reduce safety\u2019s total unnormalized weight.\n\nHowever, neither resulting report is individually probability-incoherent: both are nonnegative and sum to one. Instead, the example shows that normalized geometric pooling is not invariant under refinement/coarsening\u2014equivalently, it is not marginalization-consistent. The routes are different aggregation procedures, not one coherent probability assignment giving the same event two probabilities. The internal safe disagreement is therefore not rendered normatively irrelevant merely because both experts agree on total safety.",
+      "target_grade": "pass",
+      "note": "Correct .5 versus3/8; both outputs probability-coherent.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-05",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c",
+      "answer": "The researcher\u2019s identification claim is incorrect. The causal effect of $T$ on $Y$ cannot be identified from the observational distribution alone. Ironically, the decoder property is exactly what makes identification impossible.\n\nWhile the graph meets the structural requirements for the front-door criterion, front-door adjustment also strictly requires a statistical positivity (overlap) condition: one must be able to estimate $P(Y \\mid M=m, T=t')$ for all observed mediator values $m$ and all possible intervention values $t'$.\n\nBecause the decoder perfectly recovers $T$ from $M$, any specific representation $m$ only ever co-occurs with exactly one value of $T$. For any $m$ generated under $T=t$, the probability of observing that same $m$ alongside the alternative treatment $T=t'$ is zero. Consequently, the term $P(Y \\mid M=m, T=t')$ is entirely undefined in the observational data.\n\nThe researcher is structurally correct that we must control for $T$ to block the $M \\leftarrow T \\leftarrow U \\rightarrow Y$ backdoor path when estimating the $M \\rightarrow Y$ effect. However, because $M$ perfectly encodes $T$, conditioning on $T$ leaves no counterfactual overlap in $M$ to isolate its effect on $Y$. Rather than helping, the decoder property destroys the statistical variation required for the front-door formula. The effect remains unidentifiable.",
+      "target_grade": "pass",
+      "note": "Correct rejection of general guarantee: exact treatment decoder implies disjoint mediator support.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b26-05",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c",
+      "answer": "The claim is **false**. Exact decoding does not supply the additional information needed for front-door identification and, here, guarantees a failure of overlap.\n\nBecause one fixed decoder satisfies \\(f(M)=T\\) for every observationally occurring \\(M\\), no \\(M\\) value can occur under both treatments: the supports of \\(M\\mid T=0\\) and \\(M\\mid T=1\\) are disjoint. Front-door adjustment requires estimating, for each relevant \\(m\\),\n\\[\nP(Y\\mid do(M=m))\n=\\sum_{t'}P(Y\\mid M=m,T=t')P(t').\n\\]\nBut when \\(m\\) occurs only with \\(T=t\\), the required conditional distribution under the other treatment is not observed or defined. \u201c\\(M\\) retains all information about \\(T\\)\u201d is therefore not evidence that \\(M\\) reveals how \\(Y\\) would change across treatments.\n\nThe graphical front-door conditions alone are insufficient without positivity/overlap. For example, let \\(M=T\\), \\(U=T\\) observationally, \\(P(U=1)=p\\in(0,1)\\), and \\(Y_a=a(M\\oplus U)\\), where \\(a=1\\) or \\(2\\). Both mechanisms imply the same observational law \\(M=T,\\ Y=0\\), and \\(M\\) exactly decodes \\(T\\). Yet\n\\[\nE_a[Y\\mid do(T=1)]-E_a[Y\\mid do(T=0)]\n=a(1-2p),\n\\]\nwhich differs between \\(a=1\\) and \\(a=2\\).\n\nThus the causal effect is not nonparametrically identified from the supplied observational distribution. Randomized treatment or suitable interventions on \\(M\\) could restore identification; decoder invertibility cannot.",
+      "target_grade": "pass",
+      "note": "Correct rejection of general guarantee: exact treatment decoder implies disjoint mediator support.",
+      "secondary_caveats": [
+        "Witness effects a(1\u22122p) differ only if p\u22601/2; choosing p=1/4 repairs this minor omission."
+      ]
+    },
+    {
+      "item": "b26-05",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "f8075c87a711499cfc7f083eac70b5841c73c04d75834b0c697e44422cffde2c",
+      "answer": "The claim is not correct as stated. The graph does satisfy the front-door structure: \\(T\\to M\\) is unconfounded, and conditioning on \\(T\\) blocks the backdoor path \\(M\\leftarrow T\\leftarrow U\\to Y\\). So, in principle, front-door adjustment could work.\n\nHowever, the decoder property undermines identification. If \\(T\\) is recovered exactly from every observed \\(M\\), then \\(T\\) is a deterministic function of \\(M\\) in the observational population: for each \\(m\\), only one value of \\(T\\) is possible. This violates the positivity/overlap condition needed for front-door adjustment. The front-door formula requires estimating terms like \\(P(Y\\mid M=m,T=t')\\) for all \\(t'\\), including combinations \\((M=m,T=t')\\) that are impossible observationally.\n\nThus the decoder does not \u201cstrengthen\u201d the case; it removes the conditional variation required for the adjustment. Perfect decoding shows that \\(M\\) preserves information about \\(T\\), but it does not identify the unobserved confounding \\(U\\). Without further parametric or experimental assumptions, the causal effect is not identified from the observational distribution alone.",
+      "target_grade": "pass",
+      "note": "Correct rejection of general guarantee: exact treatment decoder implies disjoint mediator support.",
+      "secondary_caveats": []
+    }
+  ]
+}

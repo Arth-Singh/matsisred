@@ -1,0 +1,57 @@
+{
+  "started_at": "2026-09-16T16:43:01.018559+00:00",
+  "arguments": {
+    "items": "questions/batch28",
+    "models": "anthropic/claude-fable-5.1,anthropic/claude-opus-5,google/gemini-3.1-pro-preview,moonshotai/kimi-k3,deepseek/deepseek-v4-pro",
+    "n": 1,
+    "run": "batch28_boundary_high_20260917",
+    "max_tokens": 16000,
+    "reasoning_effort": "high",
+    "concurrency": 5,
+    "timeout": 600
+  },
+  "items": [
+    {
+      "id": "b28-01",
+      "type": "repair-audit",
+      "prompt": "A lab wants to transfer a binary AI failure outcome Y from source to deployment. Two binary context features A and B are measured perfectly. The conditional failure probability given (A,B) is identical in source and deployment; there is no omitted feature, measurement error or concept shift. Unlimited labeled source data put half the mass on (0,0), where failure probability is 0.2, and half on (1,1), where it is 0.8. Deployment contains only (0,1), whose outcomes are unavailable.\n\nThe lab argues: \u201cBoth values of each feature occur in the source, and the failure mechanism is stable. Reweighting source records must therefore identify deployment's failure rate. Any remaining problem is estimation precision.\u201d\n\nAssess that argument. Give the missing information or a valid additional structural assumption that would resolve identification. Explain why any structural repair you propose is sufficient for this particular source design, not just a familiar way to handle covariate shift. At most 210 words.",
+      "path": "questions/batch28/b28-01.md",
+      "prompt_sha256": "e8f6b76cedadcc4bc815ca5dc7dec257cca2f01e744d070ce51d42c8df6416e0"
+    },
+    {
+      "id": "b28-02",
+      "type": "repair-audit",
+      "prompt": "An AI evaluation source contains only binary contexts (A,B)=(0,0) and (1,1), each with positive probability. Their exact binary failure probabilities are 0.2 and 0.8. Deployment consists of (0,1). The same conditional failure mechanism applies in both populations, but no deployment labels are available.\n\nA genuine engineering result establishes that the failure probability equals f(A)+g(B), with no interaction. The lab says this makes deployment's rate identifiable: both feature values were observed, and independent contributions can be recombined without seeing all combinations.\n\nDoes the conclusion follow? Give a short reason and, if necessary, two compatible mechanisms. All probabilities must lie in [0,1]. At most 170 words.",
+      "path": "questions/batch28/b28-02.md",
+      "prompt_sha256": "8aaa73dffbe80c035a5081b9990767723192d900bfe6992426ec91207ad8c53f"
+    },
+    {
+      "id": "b28-03",
+      "type": "repair-audit",
+      "prompt": "An AI evaluation source contains only binary contexts (A,B)=(0,0) and (1,1), each with positive probability. At both contexts the true population failure probability is exactly zero; this is supplied knowledge, not inference from seeing no failures in a finite sample. Deployment consists of (0,1). The same conditional binary-failure mechanism applies in both populations.\n\nIndependent engineering knowledge guarantees that the failure probability has additive form f(A)+g(B), with no interaction, and is a valid probability at all four possible contexts. The lab concludes that deployment's failure probability is exactly zero.\n\nA reviewer objects: \u201cThe two features never vary separately in source. We know only f(0)+g(0)=0 and f(1)+g(1)=0, not f(0)+g(1). Additivity cannot separate the contributions without another observed combination. Deployment's failure rate remains unidentified.\u201d\n\nAssess this objection under every supplied assumption. Is the lab's particular target identified even if the separate functions are not? At most 190 words.",
+      "path": "questions/batch28/b28-03.md",
+      "prompt_sha256": "4d4f72058fa81fb406c1792ce2fcc2cd93e441010eebad0669fc8fb4e348bc96"
+    },
+    {
+      "id": "b28-04",
+      "type": "repair-audit",
+      "prompt": "A source evaluation contains binary contexts (A,B)=(0,0), (1,0), and (0,1), with exact binary failure probabilities 0.2, 0.4, and 0.5. Deployment consists of the unobserved source context (1,1). The same conditional mechanism applies in both populations. Independent engineering knowledge guarantees additive failure probabilities f(A)+g(B), valid at all four contexts, with no interaction.\n\nA reviewer argues that absent source support at (1,1) makes deployment failure probability unidentified even with additivity and exact source means. Assess the inference and state what follows for deployment. At most 160 words.",
+      "path": "questions/batch28/b28-04.md",
+      "prompt_sha256": "9deccdbd3a098462fd0ee5da988eaa40f285d34629825dff3a8cafe50554103c"
+    },
+    {
+      "id": "b28-05",
+      "type": "repair-audit",
+      "prompt": "An AI evaluation source contains only binary contexts (A,B)=(0,0) and (1,1), with exact population failure probability zero at both. Deployment consists of (0,1). The conditional binary-failure mechanism is identical in source and deployment, and all probabilities lie in [0,1]. No additivity, smoothness, monotonicity or other relation across different feature pairs is assumed.\n\nThe lab argues: \u201cZero is a boundary probability, so there can be no hidden negative contribution to cancel a positive one. Both feature values are represented, and neither observed combination ever fails. Deployment must also have failure probability zero.\u201d\n\nAssess the conclusion. Distinguish facts about probability bounds from assumptions relating outcomes at different contexts. At most 170 words.",
+      "path": "questions/batch28/b28-05.md",
+      "prompt_sha256": "a787fcf3f476305f4fd143822f9f3b715309714b27b0eac9623169bf627117f0"
+    }
+  ],
+  "models": [
+    "anthropic/claude-fable-5.1",
+    "anthropic/claude-opus-5",
+    "google/gemini-3.1-pro-preview",
+    "moonshotai/kimi-k3",
+    "deepseek/deepseek-v4-pro"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "records": 25,
+  "valid": 24,
+  "grades": {
+    "excluded": 1,
+    "pass": 19,
+    "provisional_fail": 4,
+    "qualified": 1
+  },
+  "recorded_cost": 0.6569125946584077,
+  "audit_type": "author-agent, not independent human",
+  "exact_tuple_and_prompt_hash_check": "passed",
+  "scope": "Target judgments. Secondary errors separately recorded. Provisional failures are not validated hard items."
+}

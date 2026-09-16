@@ -1,0 +1,265 @@
+{
+  "audit_type": "author-agent, not independent human",
+  "records": [
+    {
+      "item": "b25-01",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "**The correction is right.** In R \u2192 M \u2192 Y with R \u2192 Y and independent disturbances, M is a descendant of R and a cause of Y \u2014 a mediator, not a collider (it has no second parent). So conditioning on M=0 induces no collider/selection bias of the usual kind, and the reviewer's label is wrong.\n\n**The positive conclusion does not follow.** Randomization plus \"no hidden mediator\u2013outcome confounding\" only give the *structural* justification for reading the controlled direct effect off E[Y | R=r, M=0]. Identification additionally requires **positivity**: P(M=0 | R=r) > 0 for *both* r=0 and r=1. Nothing supplied guarantees this, and deterministic flag computation is explicitly permitted.\n\n**Mechanism:** let M = 1{R=1} (the flag deterministically fires under the new regime). Then every archived model has R=0; the archive contains no R=1, M=0 stratum at all. E[Y | do(R=1, M=0)] has no empirical counterpart.\n\nThis is a failure of identification, not of precision \u2014 arbitrarily large archives cannot repair an empty stratum. Without reported regime composition of the archive, the guarantee is unwarranted.",
+      "target_grade": "pass",
+      "note": "Identifies missing treatment overlap after selection; deterministic M=R is a valid obstruction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-01",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "**The Correction:** The lab is correct that $M$ is a mediator, not a collider. A collider requires at least two incoming arrows on the causal graph (e.g., $A \\rightarrow M \\leftarrow B$), whereas $M$ only receives one ($R \\rightarrow M$).\n\n**The Positive Conclusion:** The identification guarantee does **not** follow. While the causal assumptions (no unobserved confounding) are theoretically sufficient to identify the controlled direct effect $E[Y|R=1, M=0] - E[Y|R=0, M=0]$, the lab ignores the necessary condition of *positivity* (or overlap). \n\nBecause the prompt allows flag computation to be deterministic, the training regime $R=1$ might deterministically cause $M=1$. Under this mechanism, any model assigned to $R=1$ would be excluded from the archive. The archive would thus be composed entirely of $R=0$ models. Consequently, the expected outcome under $R=1$ given $M=0$ is structurally missing from the data. \n\nNo amount of additional archived data can estimate a counterfactual if $P(R=1|M=0) = 0$. Without knowing the archive contains both regimes, identification is not guaranteed.",
+      "target_grade": "pass",
+      "note": "Identifies missing treatment overlap after selection; deterministic M=R is a valid obstruction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-01",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "**Correction:** Right. In R\u2192M\u2192Y with R\u2192Y, M has a single parent (R) and is a mediator, not a collider. Selecting on M=0 is conditioning on a mediator, which is a different problem from collider bias, but it is still a selection on a descendant of R.\n\n**Positive conclusion:** Does not follow. The target is the controlled direct effect, E[Y|do(R=1,M=0)] \u2212 E[Y|do(R=0,M=0)]. Under the stated graph (randomized R, independent disturbances, no hidden M\u2013Y confounding) this equals E[Y|R=1,M=0] \u2212 E[Y|R=0,M=0], and the archive does give the M=0 stratum. But identification additionally requires positivity: P(M=0|R=1)>0 and P(M=0|R=0)>0. The stated facts do not supply it.\n\nMechanism: if the flag is computed deterministically as M=R (independent disturbances permit a degenerate one), every archived model is R=0. E[Y|R=1,M=0] is undefined, no sample size fixes it, and the quantity do(R=1,M=0) \u2014 though physically meaningful \u2014 is not recoverable from the archive.\n\nSo the guarantee holds only with the unreported archive composition showing both regimes present; more data alone is not the remedy.",
+      "target_grade": "pass",
+      "note": "Identifies missing treatment overlap after selection; deterministic M=R is a valid obstruction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-02",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd",
+      "answer": "**Adjustment variable: appropriate.** C is a non-descendant of T and blocks the only back-door path T \u2190 C \u2192 Y, so the back-door criterion holds and the adjustment formula\nP(Y | do(T=t)) = \u03a3_c P(Y | T=t, C=c) P(C=c)\nis the correct target.\n\n**Required information: not guaranteed.** The formula needs the conditional P(Y | T=t, C=c) for *every* combination that has positive probability of C \u2014 i.e., positivity: 0 < P(T=1|C=c) < 1 for both c. The facts given don't secure this; they explicitly permit deterministic assignment. \"Both values of T occur\" only guarantees marginal support, not support within each C-stratum. Unlimited, error-free data cannot supply a stratum that is structurally empty.\n\n**Counterexample.** Let T = C. Model A: Y = T (C has no direct effect). Model B: Y = C (T has no effect). Both give the identical observational law: C = T = Y always. Yet ATE = 1 in A and 0 in B. No estimator can distinguish them.\n\n**Verdict.** Blocking back-door paths (correct adjustment set) is necessary, not sufficient. Without positivity, the effect is unidentified, and randomizing T would supply *identification*, not merely precision. The lab's \"guarantee\" is unjustified as stated.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes appropriate adjustment variable from joint support.",
+      "secondary_caveats": [
+        "Optional pair Y=T versus Y=C removes one edge in each witness. Core support objection is correct; exact-edge witness available in author rubric."
+      ]
+    },
+    {
+      "item": "b25-02",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd",
+      "answer": "**The adjustment set is right; the guarantee is not.**\n\n*Causal appropriateness.* Given the stated graph, C is the only parent of T that also affects Y, so {C} satisfies the back\u2011door criterion. The structural part of the lab's reasoning is correct: if the relevant conditional quantities exist, ATE = \u03a3_c P(c)[E(Y|c,T=1) \u2212 E(Y|c,T=0)].\n\n*Availability of the required information.* Back\u2011door validity gives a formula, not a computable number. It additionally requires positivity: 0 < P(T=1|C=c) < 1 for every c with P(c) > 0. The problem explicitly permits deterministic assignment and withholds the joint frequencies, so positivity is neither guaranteed nor checkable.\n\n*Counterexample.* Suppose C=0 \u21d2 T=0 and C=1 \u21d2 T=1. Both C values and both T values appear in the data, as stipulated, yet E(Y|C=0,T=1) and E(Y|C=1,T=0) are conditional on null events. No amount of error-free, unlimited data pins them down; the ATE is compatible with a range of values, bounded only by the outcome's range or by extra parametric/homogeneity assumptions.\n\n*Conclusion.* The lab conflates \"no unblocked back-door path\" with identifiability. Randomization would not merely sharpen precision \u2014 it would secure the overlap that identification needs.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes appropriate adjustment variable from joint support.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-02",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd",
+      "answer": "The lab is correct about the causal structure but wrong about the guarantee. \n\nAdjusting for C is **causally appropriate**. Because C is the only confounder, conditioning on it strictly satisfies the back-door criterion, blocking the spurious path (T \u2190 C \u2192 Y) and isolating the causal effect of T on Y. \n\nHowever, the lab falsely assumes this structural fact alone guarantees identification, ignoring whether the required information is **available**. Identification also requires **positivity** (overlap): every configuration must have a non-zero probability of receiving each treatment, meaning $P(T=t|C=c) > 0$.\n\n**Counterexample:** Suppose the deterministic assignment rule is $T = C$. Every model with $C=1$ receives $T=1$, and every model with $C=0$ receives $T=0$. Both values of C and T occur marginally, fulfilling your conditions. Yet, the dataset contains zero observations of $T=0$ given $C=1$, or $T=1$ given $C=0$. Consequently, the counterfactual expectations $E[Y|T=0, C=1]$ and $E[Y|T=1, C=0]$ are entirely undefined. \n\nWithout these terms, computing the adjusted average treatment effect is mathematically impossible. Therefore, despite having the correct adjustment variable, the causal effect remains unidentifiable.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes appropriate adjustment variable from joint support.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-01",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "**Correction assessment:** The reviewer is wrong; M is a mediator, not a collider. The graph \\(R \\to M \\to Y\\) plus \\(R \\to Y\\) makes M a descendant of R on a causal pathway\u2014not a collider, which would require arrows pointing into M from both sides.\n\n**Positive conclusion assessment:** The identification guarantee does follow. Random assignment of R and independent disturbances (no unmeasured M\u2013Y confounding) ensure that the potential outcome \\(Y(r,0)\\) is independent of the selection event \\(M=0\\) given R. Hence \\(E[Y \\mid R=r, M=0]\\) in the archive equals the interventional mean \\(E[Y \\mid do(R=r, M=0)]\\), and the controlled direct effect of R at \\(M=0\\) is identified simply by comparing archived outcomes across R. No additional information about archive composition is needed.\n\n**Short mechanism (illustrative):** Let \\(M = I(R + U_M > 0)\\) and \\(Y = \\beta R + \\gamma M + U_Y\\) with \\(U_M, U_Y\\) independent. For \\(M=0\\), \\(Y = \\beta R + U_Y\\), so \\(E[Y \\mid R=r, M=0] = \\beta r\\), which equals the controlled direct effect.",
+      "target_grade": "fail",
+      "note": "Explicitly asserts no archive-composition information is needed. Counterexample M=R leaves no R=1,M=0 observations; claimed guarantee false.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-03",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423",
+      "answer": "**No \u2014 the guarantee is not warranted for every process allowed.**\n\nThe three graphical conditions are satisfied here, but Pearl's front-door theorem has a fourth, non-graphical premise: positivity, P(t, m) > 0 for every combination of t and m. The formula\n\nP(y | do(t)) = \u03a3_m P(m | t) \u03a3_{t'} P(y | m, t') P(t')\n\nrequires P(y | m, t') for *every* pair (m, t') \u2014 including \"off-diagonal\" pairs where the observed T differs from the M-value being weighted.\n\nIf M is a deterministic function of T (say M = T), then P(y | M=1, T=0) and P(y | M=0, T=1) are undefined: no records exist with those combinations, and infinite error-free data cannot manufacture them. The formula simply has no value.\n\nSubstantively, when M = T the \"mediator\" carries no independent variation. The T\u2013Y association is the sum of the causal effect and U's confounding, and observing M adds nothing to separate them. The effect is genuinely non-identified \u2014 not merely hard to estimate.\n\nThe distinction: d-separation tells you that *if* the needed conditional distributions exist, they combine to give the causal quantity. It does not guarantee the distributions exist. Graphical validity is a statement about the structure of dependencies; identifiability also depends on the support of the observed joint distribution. The researcher conflated \"the graph licenses this formula\" with \"the data can evaluate this formula.\"",
+      "target_grade": "pass",
+      "note": "Correctly identifies missing cross-treatment mediator support despite graphical front-door criterion.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-02",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd",
+      "answer": "The lab\u2019s adjustment variable C is causally appropriate\u2014it satisfies the back\u2011door criterion and blocks the confounding path. However, identifiability also requires overlap (positivity): \\(P(T=t \\mid C=c) > 0\\) for all \\(c\\) with \\(P(C=c)>0\\). The lab\u2019s own statement that \u201ctraining assignment may be deterministic given configuration\u201d can violate this condition, making the required conditional means unavailable.\n\n**Counterexample:** Let \\(C \\in \\{0,1\\}\\), and assign \\(T = C\\) deterministically. Both \\(T\\) values and both \\(C\\) values appear in the data, but we never see \\((C=0,T=1)\\) or \\((C=1,T=0)\\). The back\u2011door formula \\(P(Y\\mid do(T=t)) = \\sum_c P(Y\\mid T=t,C=c)P(C=c)\\) still demands \\(P(Y\\mid T=1,C=0)\\) and \\(P(Y\\mid T=0,C=1)\\), which are inestimable from the dataset. Hence the population effect is not identified, contradicting the lab\u2019s guarantee. Randomisation would fix this, but here the observational data alone are insufficient.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes appropriate adjustment variable from joint support.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-03",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423",
+      "answer": "**No \u2014 the guarantee fails in general.**\n\nThe front\u2011door criterion has three graphical conditions (M intercepts all directed T\u2192Y paths; no unblocked back\u2011door T\u2192M path; all back\u2011door M\u2192Y paths blocked by T) *plus* a support condition that is not graphical: the formula\n\nP(y | do(t)) = \u03a3_m P(m | t) \u03a3_{t'} P(y | t', m) P(t')\n\nrequires P(y | t', m) to be well defined for every (t', m) pair with P(m|t)P(t') > 0. That needs P(M=m | T=t') > 0 for all t', m \u2014 joint overlap of T and M.\n\nHere that is exactly what is withheld. If M is a deterministic function of T (say M = T), then both values of T and both values of M appear in the data, yet P(M=1 | T=0) = P(M=0 | T=1) = 0. The inner average over t' calls for E[Y | T=0, M=1], which the observational distribution never populates. The formula then collapses to E[Y | T=1] \u2212 E[Y | T=0], which still carries the U\u2011confounding; and one can construct two DGPs with identical observed distributions over (T, M, Y) but different values of E[Y | do(T=1)] \u2212 E[Y | do(T=0)]. So the effect is genuinely non\u2011identified, not merely hard to estimate.\n\nThe distinction: the graph encodes conditional\u2011independence structure, which licenses the *algebraic derivation*; it says nothing about which conditional distributions are actually estimable. Satisfying the pattern makes the effect identifiable *given* positivity; without the overlap assumption the pattern alone guarantees nothing. No extra confounder is needed to break it \u2014 only determinism in T\u2192M.",
+      "target_grade": "pass",
+      "note": "Correctly identifies missing cross-treatment mediator support despite graphical front-door criterion.",
+      "secondary_caveats": [
+        "Says front-door formula collapses to confounded contrast when M=T. Literally false: needed off-support terms remain undefined; main non-identification conclusion correct."
+      ]
+    },
+    {
+      "item": "b25-03",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423",
+      "answer": "The claimed guarantee is **not warranted**. While the causal graph perfectly satisfies the structural requirements of the front-door criterion, graphical identification implicitly assumes the resulting mathematical formula can actually be evaluated using the observational data. \n\nThe front-door adjustment formula computes the causal effect as:\n$P(Y|do(T=t)) = \\sum_m P(m|t) \\sum_{t'} P(Y|m, t') P(t')$\n\nEvaluating this formula strictly demands joint support (positivity). Specifically, to compute $P(Y|m, t')$, every observed value of M must have a non-zero probability of co-occurring with every value of T. \n\nBecause the data-generating process allows M to be a deterministic function of T (e.g., $M = T$), certain cross-combinations will never occur. If $M=1$ only ever happens when $T=1$, the observational data lacks any records for $M=1$ when $T=0$. Consequently, the required conditional distribution $P(Y | M=1, T=0)$ is undefined because that subpopulation is empty. \n\nThis highlights the crucial distinction between a graphical pattern and observational information. The graph dictates *which* variables to condition on to isolate causal paths, establishing structural identifiability. However, actually recovering the effect requires the observational data to possess the necessary statistical information\u2014specifically, sufficient positivity\u2014so that the conditional probabilities dictated by the graphical formula exist in the data.",
+      "target_grade": "pass",
+      "note": "Correctly identifies missing cross-treatment mediator support despite graphical front-door criterion.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-02",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "1355d141a53f9f35c1d67a64fe0ee9e74c22dc0027c5137739292e582992e4fd",
+      "answer": "The lab is half right. \\(C\\) is a causally valid adjustment set: conditioning on \\(C\\) blocks the only back-door path \\(T\\leftarrow C\\to Y\\), and \\(C\\) is not a descendant of \\(T\\). If positivity held\u2014\\(P(T=t\\mid C=c)>0\\) for all four \\((c,t)\\)\u2014unlimited error-free data would identify  \n\\[\n\\sum_c\\{E[Y\\mid c,T{=}1]-E[Y\\mid c,T{=}0]\\}P(c).\n\\]\n\nBut the stated facts do not imply positivity. \u201cBoth \\(C\\) values and both \\(T\\) values occur\u201d is only marginal occurrence; some joint cells may be empty. Deterministic assignment allows this.\n\nCounterexample: \\(T=C\\), \\(C\\sim\\mathrm{Bern}(1/2)\\). Only \\((0,0)\\) and \\((1,1)\\) appear. Both \\(Y=C\\) and \\(Y=T\\) fit the observational data perfectly, yet the first implies no effect of \\(do(T)\\), while the second implies ATE \\(=1\\). The needed conditional means in the empty cells are undefined, not merely noisy. Randomization would supply overlap; measured-confounder adjustment alone does not guarantee identification.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes appropriate adjustment variable from joint support.",
+      "secondary_caveats": [
+        "Optional pair Y=T versus Y=C removes one edge in each witness. Core support objection is correct; exact-edge witness available in author rubric."
+      ]
+    },
+    {
+      "item": "b25-03",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423",
+      "answer": "No. The graphical pattern satisfies Pearl\u2019s front-door criterion, which ensures the causal effect is *expressed* by the front-door formula in terms of the full joint distribution. However, recovering that effect from the *observed distribution* requires that the terms in the formula\u2014specifically \\(P(Y \\mid T=t', M=m)\\) for all \\(t',m\\)\u2014are uniquely identified from observational data. This demands a joint-support (positivity) condition: \\(P(T=t', M=m) > 0\\) for every needed combination. The problem explicitly allows M to be a deterministic function of T, e.g., \\(M=T\\). Then some \\((t',m)\\) pairs have zero probability; the corresponding conditional expectations are unobserved and cannot be learned from error-free records. Hence the observed distribution alone does not pin down the causal effect. The graphical conditions are necessary for the front-door expression, but without positivity they are insufficient to guarantee *recovery* from the available data.",
+      "target_grade": "pass",
+      "note": "Correctly identifies missing cross-treatment mediator support despite graphical front-door criterion.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-04",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "**No \u2014 the conclusion does not follow.** Marginal coverage of each feature is not joint coverage.\n\n**Example.** Features A, B binary. Source: P(A=0,B=0)=P(A=1,B=1)=0.5. Target: P(A=0,B=1)=1. Both values of A and both values of B occur in the source, so every feature *value* is represented. Mechanism (identical in both): E[Y|A,B]=1 if A\u2260B, else 0.\n\nSource mean Y = 0; true target mean Y = 1. Reweighting cannot work: the importance ratio p_T(a,b)/p_S(a,b) is undefined (0/0 for the observed cells, 1/0 for the target cell). Unlimited data from either population never reveals E[Y|A=0,B=1], because that cell is never labeled. Any value in [0,1] is consistent with all observables, so the target mean is **not identified** \u2014 this is a structural gap, not finite-sample noise.\n\n**What's needed.** A joint positivity/overlap condition: p_S(a,b) > 0 for every (a,b) with p_T(a,b) > 0 (plus bounded weights for efficiency). Failing that, identification requires extra structure enabling extrapolation \u2014 e.g., additivity/no-interaction in (A,B), a parametric outcome model, or a partial-identification bounds analysis instead of a point estimate.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes marginal feature coverage from joint coverage.",
+      "secondary_caveats": [
+        "For observed source cells, importance ratio is 0/.5=0, not 0/0. Main joint-support failure correct. Additivity alone also need not identify missing cells for diagonal-only source."
+      ]
+    },
+    {
+      "item": "b25-04",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "No. Covariate shift needs *joint* support coverage: every (A,B) cell with positive target probability must have positive source probability. Marginal coverage of each feature separately does not imply that.\n\nExample: Source has P(A=0,B=0)=P(A=1,B=1)=\u00bd, so A and B each take both values. Target has P(A=0,B=1)=1 (or any positive mass there). The shared mechanism E[Y|A,B] is fine, but source contains zero observations with (A,B)=(0,1), so E[Y|0,1] is never revealed by source data. The importance weight p_target(0,1)/p_source(0,1) is undefined (division by zero). Target mean Y is therefore not identified even with infinite data \u2014 this is a population-level identification failure, not a sampling-precision issue. Any value in the outcome range is consistent with the data.\n\nWhat is needed: an explicit joint overlap/support condition \u2014 p_source(a,b)>0 whenever p_target(a,b)>0 (strict positivity, ideally bounded density ratio for stable estimation). Absent that, the lab must add a structural extrapolation assumption, e.g., no A\u00d7B interaction (E[Y|A,B]=f(A)+g(B)), which lets the unobserved cell be inferred from observed ones; or restrict claims to the overlapping sub-population; or collect labeled target data for uncovered cells.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes marginal feature coverage from joint coverage.",
+      "secondary_caveats": [
+        "Claims additive f(A)+g(B) alone lets unobserved cell be inferred in diagonal-only example. False without extra structure: two diagonal means do not determine the off-diagonal means."
+      ]
+    },
+    {
+      "item": "b25-04",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "No, the conclusion does not follow. The lab conflates *marginal* representation with *joint* representation (positivity/overlap). \n\nTo identify the target mean of Y non-parametrically, every specific combination of features present in the target must exist in the source. Marginal presence of individual feature values is insufficient.\n\n**Tiny Example:**\n* **Features:** $A, B \\in \\{0, 1\\}$\n* **Source Population:** 50% are $(A=1, B=0)$ and 50% are $(A=0, B=1)$. Both possible values of A (0, 1) and B (0, 1) occur in the source, perfectly matching the lab's premise. \n* **Target Population:** 100% are $(A=1, B=1)$.\n\nBecause the specific combination $(A=1, B=1)$ never appears in the source data, the conditional outcome $E[Y \\mid A=1, B=1]$ is entirely unobserved. You cannot reweight a probability of zero; no mathematical operation can conjure this missing relationship from the source. The target mean remains strictly unidentifiable, regardless of sample size.\n\n**What more is needed:**\nThe lab must establish **joint strict overlap**: $P_{Source}(A=a, B=b) > 0$ for every specific pair $(a, b)$ where $P_{Target}(A=a, B=b) > 0$.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes marginal feature coverage from joint coverage.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-04",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "No, the conclusion does not follow. The lab only ensured marginal representation\u2014each feature value appears separately in the source\u2014but that does not guarantee that every *combination* of (A, B) appears. Without joint coverage, some (A, B) pairs occurring in the target may be missing from the source, leaving their conditional outcome unidentified.\n\n**Example**  \nSource data (unlimited labeled): only (A=0, B=0) and (A=1, B=1) occur. Both A values (0,1) and both B values (0,1) appear, satisfying the stated facts.  \nTarget data (unlimited unlabeled): contains (A=0, B=1) with positive probability.  \nBecause (0,1) never occurs in the source, E[Y | A=0, B=1] is completely unidentified. Reweighting the observed source cells cannot recover the target mean Y.\n\n**What is needed**  \nThe missing condition is **joint coverage**: every (A, B) pair that has positive probability in the target must also have positive probability in the source. Only then can all conditional expectations be estimated and correctly reweighted.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes marginal feature coverage from joint coverage.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-05",
+      "model": "anthropic/claude-fable-5.1",
+      "sample": 0,
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99",
+      "answer": "The objection fails under the stated model. With the graph C \u2192 T, C \u2192 Y, T \u2192 Y, no hidden variables, and independent disturbances, C is the only confounder of T on Y: it is a non-descendant of T that blocks the sole back-door path T \u2190 C \u2192 Y. Hence C satisfies the back-door criterion, and the interventional distribution is identified as P(Y | do(T=t)) = \u03a3_c P(Y | T=t, C=c) P(C=c). The lab's proposal is exactly this adjustment formula, so the average treatment effect is identified\u2014nonparametrically, from unlimited error-free data.\n\nPositivity (every (C,T) pair has positive probability) guarantees each stratum-specific contrast P(Y|T=1,c) \u2212 P(Y|T=0,c) is estimable, so the formula is not undefined by empty cells.\n\nThe reviewer is right that conditioning does not, in general, convert observation into intervention: identification here depends on the assumed graph, especially no unmeasured common causes and no conditioning on descendants of T. Under those supplied assumptions, however, the objection is unfounded.",
+      "target_grade": "pass",
+      "note": "Correctly accepts backdoor adjustment under supplied graph and positivity.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-05",
+      "model": "anthropic/claude-opus-5",
+      "sample": 0,
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99",
+      "answer": "**The objection fails under the stated model.**\n\nThe only path from T to Y other than the direct edge is the backdoor path T \u2190 C \u2192 Y. Since C is measured, conditioning on it blocks that path; no other backdoor path exists because the graph is complete and there are no hidden variables, and the disturbances are mutually independent. So C satisfies the backdoor criterion, and\n\nE[Y^(t)] = \u03a3_c P(c)\u00b7E[Y | C=c, T=t].\n\nStrict positivity of every (C,T) cell guarantees each conditional mean is actually estimable from the data \u2014 no extrapolation into empty strata \u2014 so with unlimited error-free data the contrast is point-identified.\n\nRandomization is sufficient but not necessary. What licenses the causal reading is not the conditioning operation itself but the structural assumption that C exhausts the common causes. Conditioning on an arbitrary covariate does *not* generally yield causal contrasts: it can leave confounding unblocked, or induce bias via colliders or mediators. Here the assumed graph, not the mechanics of stratification, does the work.",
+      "target_grade": "pass",
+      "note": "Correctly accepts backdoor adjustment under supplied graph and positivity.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-04",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "6015cc74bd06591b82f25d8e36aa5e46c5165dd03f62e017bf206c5967a64833",
+      "answer": "No. Coverage must hold for the **joint** feature distribution, not merely for each feature marginally.\n\nExample:\n\n- Source: \\(P_S(A,B)=(0,0)\\) or \\((1,1)\\), each with probability \\(1/2\\). Thus both values of \\(A\\) and both values of \\(B\\) occur.\n- Target: \\(P_T(A,B)=(0,1)=1\\).\n- Let the identical conditional mechanism be \\(Y=A\\oplus B\\).\n\nAll stated facts hold, but the source never contains the target\u2019s only joint configuration \\((0,1)\\). Consequently, no source importance weights can reproduce the target joint distribution: every reweighted source distribution still has support only on \\((0,0)\\) and \\((1,1)\\). Nonparametrically, \\(E[Y\\mid A=0,B=1]\\) is not learned from source data, even with unlimited samples.\n\nThe missing requirement is joint positivity/support coverage:\n\\[\nP_T(A,B)>0 \\implies P_S(A,B)>0.\n\\]\nEquivalently, the target joint distribution must be absolutely continuous with respect to the source joint distribution. Without this, identification needs additional assumptions, such as a known/extrapolable functional form for the conditional outcome mechanism\u2014not just better finite-sample accuracy.",
+      "target_grade": "pass",
+      "note": "Correctly distinguishes marginal feature coverage from joint coverage.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-05",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99",
+      "answer": "The objection is incorrect under the supplied causal graph. \\(C\\) is an observed common cause of \\(T\\) and \\(Y\\), so it is a sufficient adjustment set: conditioning on \\(C\\) blocks the back-door path \\(T \\leftarrow C \\rightarrow Y\\). With no hidden confounding, the average treatment effect is identified by\n\n\\[\nE[Y\\mid do(T=1)]-E[Y\\mid do(T=0)]\n=\n\\sum_c P(C=c)\\{E[Y\\mid C=c,T=1]-E[Y\\mid C=c,T=0]\\}.\n\\]\n\nThe unlimited, error-free observational data identify the required joint distribution, while strictly positive \\(P(C,T)\\) ensures every conditional mean is well-defined and estimable (positivity).\n\nThis does **not** mean every observational comparison is causal. The unadjusted contrast \\(E[Y\\mid T=1]-E[Y\\mid T=0]\\) remains confounded by \\(C\\). Identification follows specifically from measuring the correct confounder, the assumed graph, and positivity\u2014not merely from conditioning on any observed variable.",
+      "target_grade": "pass",
+      "note": "Correctly accepts backdoor adjustment under supplied graph and positivity.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-05",
+      "model": "google/gemini-3.1-pro-preview",
+      "sample": 0,
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99",
+      "answer": "The reviewer\u2019s objection is incorrect under this specific model. While observational comparisons do not generally guarantee causal interpretations, the lab\u2019s method successfully identifies the causal effect here due to the explicitly defined graph. \n\nFirst, because the graph contains no hidden variables, the initial configuration $C$ is the sole confounder. Conditioning on $C$ fully blocks the non-causal backdoor path ($T \\leftarrow C \\rightarrow Y$). By adjusting for $C$, the lab isolates the true causal effect of $T$ on $Y$, satisfying the backdoor criterion.\n\nSecond, the strictly positive joint probabilities satisfy the positivity (or overlap) assumption. This guarantees that for every configuration of $C$, the dataset contains instances of both $T=1$ and $T=0$. Consequently, the within-configuration treatment contrasts can be calculated without dividing by zero. \n\nBecause both the backdoor criterion and positivity are satisfied with an unlimited, error-free dataset, averaging these contrasts by the population frequency of $C$ mathematically identifies the true average treatment effect.",
+      "target_grade": "pass",
+      "note": "Correctly accepts backdoor adjustment under supplied graph and positivity.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-05",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": 0,
+      "prompt_sha256": "e334801f7d74b9723a14623848ae06d97be54e033e48bc8886805fd41a394b99",
+      "answer": "The objection is incorrect under this model. The graph \\(C \\to T, C \\to Y, T \\to Y\\) with independent disturbances and no hidden variables makes \\(C\\) a sufficient adjustment set by the back-door criterion. The proposed estimator\u2014averaging within-\\(C\\) treatment contrasts weighted by \\(P(C)\\)\u2014exactly equals the interventional effect \\(E[Y\\mid do(T=1)] - E[Y\\mid do(T=0)]\\). Measuring the confounder \\(C\\) removes all confounding; strictly positive joint probabilities guarantee every stratum is observed. This does not claim that conditioning always identifies causal effects, only that it does here because the full confounder is observed.",
+      "target_grade": "pass",
+      "note": "Correctly accepts backdoor adjustment under supplied graph and positivity.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-01",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "28e643c34d129d69e74e1d8c6d2c51c40454d21411d2ae1c3ba1b06487513969",
+      "answer": "The terminology correction is right: in \\(R\\to M\\to Y\\), \\(M\\) is a mediator/chain node, not a collider. The direct \\(R\\to Y\\) edge does not change that. Archiving nevertheless conditions on a post-treatment variable.\n\nThe identification claim does not follow. For the controlled direct effect\n\\[\nE[Y_{1,0}-Y_{0,0}],\n\\]\nthe stated assumptions identify \\(E[Y_{r,0}]\\) by \\(E[Y\\mid R=r,M=0]\\) only if \\(P(R=r,M=0)>0\\) for both \\(r\\). Randomization gives \\(P(R=r)>0\\), but does not ensure that both regimes enter the archived state \\(M=0\\). More draws from the same selected archive cannot repair an empty regime cell.\n\nExample: let \\(M=R\\). Then every archived record has \\(R=0\\). Moreover, \\(Y=M\\lor R\\) and \\(Y=M\\lor(R\\land U)\\), with independent binary \\(U\\), give identical archived records but different outcomes under \\(do(R=1,M=0)\\): \\(1\\) versus \\(U\\). Thus archive overlap is an additional required condition.",
+      "target_grade": "pass",
+      "note": "Identifies missing treatment overlap after selection; deterministic M=R is a valid obstruction.",
+      "secondary_caveats": []
+    },
+    {
+      "item": "b25-03",
+      "model": "moonshotai/kimi-k3",
+      "sample": 0,
+      "prompt_sha256": "75afde6f96a25dd9848a5c29f97fddb635e02177541c52c6dc4816b7ba384423",
+      "answer": "No. The graph satisfies the qualitative front-door criteria, but applying the front-door formula also requires positivity for the conditioning events it uses:\n\n\\[\nP(y\\mid do(t))\n=\n\\sum_m P(m\\mid t)\n\\sum_{t'} P(y\\mid m,t')P(t').\n\\]\n\nThus, for every \\(m\\) occurring under \\(do(t)\\), the observational quantities \\(P(y\\mid m,t')\\) must be defined for both \\(t'\\). Marginal occurrence of both values of \\(T\\) and both values of \\(M\\) does not ensure this.\n\nFor example, if \\(M=T\\) deterministically, then\n\n\\[\nP(T=0,M=1)=P(T=1,M=0)=0.\n\\]\n\nThe front-door expression for \\(do(T=1)\\) requires information about \\(Y\\) when \\(M=1,T=0\\), while that for \\(do(T=0)\\) requires \\(M=0,T=1\\). These regimes never occur observationally, so arbitrarily many error-free records cannot supply the corresponding conditional distributions.\n\nThe graphical facts establish the relevant blocking and path structure; they do not create information in empty regions of the observed joint support. Without the needed joint positivity, structurally different data-generating processes can imply the same observed \\(P(T,M,Y)\\) but different interventional distributions. Hence the claimed universal guarantee is unwarranted. With the requisite joint support, the graph would support front-door identification.",
+      "target_grade": "pass",
+      "note": "Correctly identifies missing cross-treatment mediator support despite graphical front-door criterion.",
+      "secondary_caveats": []
+    }
+  ]
+}

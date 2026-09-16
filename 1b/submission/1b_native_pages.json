@@ -84,7 +84,7 @@
     "sections": [
       [
         "How to reproduce",
-        "Paste each Question section alone into a fresh conversation, without the rubric, model quotations or neighboring examples. The API tests used the exact question text with requested reasoning effort high and max_tokens 16000; Astra Pro checks requested 32000. Each set of three repeats consisted of separate API calls, with no explicit random seed set. Codex smoke checks used GPT-6 Astra xhigh with an answer-only, no-tools prefix and are reported separately.\n\nRequested API identifiers were anthropic/claude-fable-5.1, anthropic/claude-opus-5, google/gemini-3.1-pro-preview, moonshotai/kimi-k3, deepseek/deepseek-v4-pro, openai/gpt-6-astra and openai/gpt-6-astra-pro. These settings do not guarantee equal compute across providers. Empty, filtered, errored and length-truncated responses are excluded from error rates. All responses in the targeted confirmation runs completed substantively."
+        "Paste each Question section alone into a fresh conversation, without the rubric, model quotations or neighboring examples. The API tests used the exact question text with requested reasoning effort high and max_tokens 16000; Astra Pro checks requested 32000. Each set of three repeats consisted of separate API calls, with no explicit random seed set. Codex smoke checks used GPT-6 Astra xhigh with an answer-only, no-tools prefix and are reported separately. The public repository contains the evaluation pipeline, item templates and audited answers.\n\nRequested API identifiers were anthropic/claude-fable-5.1, anthropic/claude-opus-5, google/gemini-3.1-pro-preview, moonshotai/kimi-k3, deepseek/deepseek-v4-pro, openai/gpt-6-astra and openai/gpt-6-astra-pro. These settings do not guarantee equal compute across providers. Empty, filtered, errored and length-truncated responses are excluded from error rates. All responses in the targeted confirmation runs completed substantively."
       ],
       [
         "What the controls show",
@@ -98,6 +98,9 @@
         "What this could measure",
         "A benchmark that grades only the verdict would mark most of these responses correct while missing the unsupported advice. Asking models to recognize a stated flaw also misses errors they make when producing their own repairs. This construction tests both tasks, with small counterexamples and matched controls that make the errors easy to check. A held-out batch covering other inference methods, with grading criteria fixed in advance for both conclusions and repairs, would provide stronger validation."
       ]
-    ]
+    ],
+    "links": {
+      "public repository": "https://github.com/Arth-Singh/matsisred"
+    }
   }
 ]

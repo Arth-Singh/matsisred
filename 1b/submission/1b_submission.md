@@ -98,7 +98,7 @@ Every screened model rejected the main guarantee. In fresh high-effort confirmat
 
 ## How to reproduce
 
-Paste each Question section alone into a fresh conversation, without the rubric, model quotations or neighboring examples. The API tests used the exact question text with requested reasoning effort high and max_tokens 16000; Astra Pro checks requested 32000. Each set of three repeats consisted of separate API calls, with no explicit random seed set. Codex smoke checks used GPT-6 Astra xhigh with an answer-only, no-tools prefix and are reported separately.
+Paste each Question section alone into a fresh conversation, without the rubric, model quotations or neighboring examples. The API tests used the exact question text with requested reasoning effort high and max_tokens 16000; Astra Pro checks requested 32000. Each set of three repeats consisted of separate API calls, with no explicit random seed set. Codex smoke checks used GPT-6 Astra xhigh with an answer-only, no-tools prefix and are reported separately. The [public repository](https://github.com/Arth-Singh/matsisred) contains the evaluation pipeline, item templates and audited answers.
 
 Requested API identifiers were anthropic/claude-fable-5.1, anthropic/claude-opus-5, google/gemini-3.1-pro-preview, moonshotai/kimi-k3, deepseek/deepseek-v4-pro, openai/gpt-6-astra and openai/gpt-6-astra-pro. These settings do not guarantee equal compute across providers. Empty, filtered, errored and length-truncated responses are excluded from error rates. All responses in the targeted confirmation runs completed substantively.
 

@@ -148,6 +148,8 @@ def main():
     for page in pages:
         composed.append('# ' + page['title'])
         for heading, text in page['sections']:
+            for label, url in page.get('links', {}).items():
+                text = text.replace(label, f'[{label}]({url})')
             composed.extend(['## ' + heading, text])
     require('\n\n'.join(composed) + '\n' == (project / 'submission/1b_submission.md').read_text(),
             'Markdown and composition JSON disagree')
